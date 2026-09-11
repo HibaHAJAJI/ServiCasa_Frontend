@@ -46,11 +46,13 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        <div className="login-header">
-
-          <h2 className="brand-name">ServiCasa</h2>
-          <p className="brand-subtext">DES ARTISANS POUR VOTRE MAISON</p>
-        </div>
+          <div className="login-header">
+            <h2 className="brand-name">
+              <span className="brand-servi">Servi</span>
+              <span className="brand-casa">Casa</span>
+            </h2>
+            <p className="brand-subtext">DES ARTISANS POUR VOTRE MAISON</p>
+          </div>
 
         <div className="title-section">
           <h1>Connexion</h1>
