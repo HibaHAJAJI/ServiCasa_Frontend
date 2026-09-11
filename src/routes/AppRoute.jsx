@@ -1,16 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/login/Login';
 import RegisterSelection from '../pages/register/RegisterSelection';
-
+import RegisterArtisan from '../pages/register/RegisterArtisan'; 
 const RegisterClient = () => (
   <div style={{ padding: '40px', textAlign: 'center' }}>
     Formulaire d'inscription Client
-  </div>
-);
-
-const RegisterArtisan = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    Formulaire d'inscription Artisan
   </div>
 );
 

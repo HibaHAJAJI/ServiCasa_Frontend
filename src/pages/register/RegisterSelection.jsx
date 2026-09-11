@@ -51,11 +51,6 @@ const RegisterSelection = () => {
           </div>
         </div>
 
-        <div className="card-footer">
-          <p>
-            Déjà un compte ? <a href="/login">Se connecter</a>
-          </p>
-        </div>
       </div>
     </div>
   );

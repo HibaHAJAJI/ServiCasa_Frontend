@@ -109,10 +109,7 @@ const Login = () => {
             <FaArrowRight size={16} />
           </button>
         </form>
-
-        <div className="card-footer">
-          <p>Vous n'avez pas encore de compte ?</p>
-        </div>
+        
       </div>
     </div>
   );
