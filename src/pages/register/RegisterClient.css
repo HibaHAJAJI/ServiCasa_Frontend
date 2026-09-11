@@ -1,0 +1,153 @@
+.client-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8fafc;
+  padding: 2rem 1rem;
+}
+
+.client-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e2e8f0;
+  width: 100%;
+  max-width: 580px;
+  padding: 2.5rem 2rem;
+}
+
+.client-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.client-header h1 {
+  font-size: 1.75rem;
+  color: #0b132a;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-family: serif, sans-serif;
+}
+
+.client-header p {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.client-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.client-form input[type="text"],
+.client-form input[type="tel"],
+.client-form input[type="email"],
+.client-form input[type="password"] {
+  width: 100%;
+  padding: 0.75rem 0.85rem 0.75rem 2.6rem;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.client-form input:focus {
+  border-color: #0b132a;
+  background-color: #ffffff;
+}
+
+.client-form input.input-error {
+  border-color: #ef4444;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.toggle-password:hover {
+  color: #64748b;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+.submit-client-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #0b132a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+
+.submit-client-btn:hover {
+  background-color: #1a2544;
+}
+
+@media (max-width: 540px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .client-card {
+    padding: 1.5rem 1.25rem;
+  }
+}

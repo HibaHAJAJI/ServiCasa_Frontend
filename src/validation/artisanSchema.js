@@ -11,13 +11,11 @@ export const artisanSchema = yup.object().shape({
     .required('Le prénom est requis')
     .min(2, 'Le prénom doit contenir au moins 2 caractères'),
 
-  telephone: yup
-    .string()
-    .required('Le numéro de téléphone est requis')
-    .matches(
-      /^(?:\+212|0)[5-7]\d{8}$/,
-      'Numéro de téléphone marocain invalide (ex: +212600000000 ou 0600000000)'
-    ),
+   telephone: yup
+  .string()
+  .matches(/^[0-9+\s-]+$/, 'Numéro de téléphone invalide')
+  .min(8, 'Le numéro doit contenir au moins 8 chiffres')
+  .required('Le numéro de téléphone est obligatoire'),
 
   ville: yup
     .string()

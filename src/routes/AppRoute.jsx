@@ -2,11 +2,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/login/Login';
 import RegisterSelection from '../pages/register/RegisterSelection';
 import RegisterArtisan from '../pages/register/RegisterArtisan'; 
-const RegisterClient = () => (
-  <div style={{ padding: '40px', textAlign: 'center' }}>
-    Formulaire d'inscription Client
-  </div>
-);
+import RegisterClient from '../pages/register/RegisterClient';
+
+
 
 const AppRoutes = () => {
   return (

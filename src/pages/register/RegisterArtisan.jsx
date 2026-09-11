@@ -44,7 +44,7 @@ const RegisterArtisan = () => {
     };
 
     try {
-      await authService.RegisterArtisans(payload);
+      await authService.RegisterArtisan(payload);
       navigate('/login');
     } catch (err) {
       console.error("Erreur backend:", err.response);
@@ -69,7 +69,7 @@ const RegisterArtisan = () => {
       <div className="artisan-card">
         <div className="artisan-header">
           <h1>Créer votre compte Artisan</h1>
-          <p>Remplissez le formulaire pour rejoindre FixCasa.</p>
+          <p>Remplissez le formulaire pour rejoindre ServiCasa.</p>
         </div>
 
         {apiError && <div className="error-message-box">{apiError}</div>}

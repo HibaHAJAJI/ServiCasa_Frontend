@@ -7,8 +7,13 @@ const authService = {
         return response.data
     },
 
-    RegisterArtisans : async(data)=>{
+    RegisterArtisan : async(data)=>{
         const reponse = await api.post('/auth/register/artisan',data);
+        return reponse.data
+    },
+    
+     RegisterClient : async(data)=>{
+        const reponse = await api.post('/auth/register/client',data);
         return reponse.data
     }
 }
