@@ -32,7 +32,7 @@ const RegisterClient = () => {
 
   const onSubmit = async (data) => {
     try {
-      await authService.RegisterClient(data);
+      await authService.registerClient(data);
       navigate('/login');
     } catch (err) {
       console.error(err);
