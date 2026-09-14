@@ -1,115 +1,136 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { 
-  FaEnvelope, 
-  FaLock, 
-  FaEye, 
-  FaEyeSlash,  
-  FaArrowRight 
-} from 'react-icons/fa';
-import { loginSchema } from '../../validation/loginSchema';
-import authService from '../../services/authService';
-import './Login.css';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import {
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+  FaArrowRight
+} from "react-icons/fa";
+
+import { loginSchema } from "../../validation/loginSchema";
+import authService from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
+
+import "./Login.css";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm({
-    resolver: yupResolver(loginSchema),
+    resolver: yupResolver(loginSchema)
   });
 
   const onSubmit = async (data) => {
-    setServerError('');
+    setServerError("");
     setLoading(true);
 
     try {
-      await authService.login(data);
-      alert('Connexion réussie !');
-    } catch (err) {
-      if (err.response && err.response.status === 401) {
-        setServerError('Email ou mot de passe incorrect.');
-      } else {
-        setServerError('Une erreur est survenue lors de la connexion.');
-      }
+      const response = await authService.login(data);
+
+      login(response.token);
+
+      navigate("/dashboard");
+    } catch (error) {
+      setServerError("Email ou mot de passe incorrect.",error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-          <div className="login-header">
-            <h2 className="brand-name">
-              <span className="brand-servi">Servi</span>
-              <span className="brand-casa">Casa</span>
-            </h2>
-            <p className="brand-subtext">DES ARTISANS POUR VOTRE MAISON</p>
-          </div>
+    <div className="login-page">
+      <div className="login-container">
 
-        <div className="title-section">
-          <h1>Connexion</h1>
-          <p>Connectez-vous pour accéder à votre espace.</p>
+        <div className="login-logo">
+          <span>Servi</span>
+          <span>Casa</span>
         </div>
 
-        {serverError && <div className="error-message">{serverError}</div>}
+        <h1>Connexion</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+        <p className="login-subtitle"> Connectez-vous pour accéder à votre espace.</p>
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+
           <div className="form-group">
-            <label htmlFor="email">EMAIL</label>
+            <label>EMAIL</label>
+
             <div className="input-wrapper">
-              <FaEnvelope className="input-icon" size={16} />
+              <FaEnvelope className="input-icon" />
+
               <input
                 type="email"
-                id="email"
                 placeholder="Votre adresse email"
-                {...register('email')}
+                {...register("email")}
               />
             </div>
-            {errors.email && <p className="field-error">{errors.email.message}</p>}
+
+            {errors.email && (
+              <p className="error-message">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">MOT DE PASSE</label>
+            <label>MOT DE PASSE</label>
+
             <div className="input-wrapper">
-              <FaLock className="input-icon" size={16} />
+              <FaLock className="input-icon" />
+
               <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Votre mot de passe"
-                {...register('password')}
+                {...register("password")}
               />
+
               <button
                 type="button"
-                className="toggle-password"
+                className="password-button"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
-            {errors.password && <p className="field-error">{errors.password.message}</p>}
+
+            {errors.password && (
+              <p className="error-message">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
-          <div className="form-options">
+          {serverError && (
+            <p className="server-error">
+              {serverError}
+            </p>
+          )}
 
-            <a href="#forgot" className="forgot-password">
-              Mot de passe oublié ?
-            </a>
-          </div>
+          <button
+            type="submit"
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? "Connexion..." : "Se connecter"}
 
-          <button type="submit" className="submit-btn" disabled={loading}>
-            <span>{loading ? 'Connexion...' : 'Se connecter'}</span>
-            <FaArrowRight size={16} />
+            {!loading && <FaArrowRight />}
           </button>
+
         </form>
-        
+
       </div>
     </div>
   );

@@ -5,7 +5,8 @@ import RegisterSelection from '../pages/register/RegisterSelection';
 import RegisterArtisan from '../pages/register/RegisterArtisan'; 
 import RegisterClient from '../pages/register/RegisterClient';
 
-import PrivateNavbar from '../components/navbar/PrivateNavbar';
+
+import Dashboard from '../pages/dashboard/Dashboard';
 
 
 
@@ -19,8 +20,8 @@ const AppRoutes = () => {
       <Route path="/register/client" element={<RegisterClient />} />
       <Route path="/register/artisan" element={<RegisterArtisan />} />
 
+        <Route path="/dashboard" element={<Dashboard />} />
 
-      <Route  path="/test-navbar" element={  <PrivateNavbar />  }   />
 
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
