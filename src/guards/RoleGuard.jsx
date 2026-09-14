@@ -3,19 +3,9 @@ import { jwtDecode } from "jwt-decode";
 
 function RoleGuard({ allowedRoles }) {
   const token = localStorage.getItem("token");
+  const user = jwtDecode(token);
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-
-  let user;
-  try {
-    user = jwtDecode(token);
-  } catch {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (!user || !allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(user.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 
