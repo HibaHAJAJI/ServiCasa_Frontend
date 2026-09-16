@@ -1,3 +1,4 @@
+// src/components/sidebar/Sidebar.jsx
 import { NavLink } from "react-router-dom";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
@@ -36,6 +37,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           );
         })}
 
+        {/* Mon profil m-zida b nfs l'style original */}
         <NavLink
           to="/artisan/profile"
           onClick={onClose}
@@ -52,6 +54,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         </NavLink>
       </nav>
 
+      {/* Déconnexion */}
       <div className="p-4 border-t border-slate-200 bg-slate-50/50">
         <button
           onClick={() => {
