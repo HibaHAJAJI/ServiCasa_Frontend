@@ -6,7 +6,9 @@ import RegisterArtisan from '../pages/register/RegisterArtisan';
 import RegisterClient from '../pages/register/RegisterClient';
 
 import Dashboard from '../pages/dashboard/DashboardArtisan';
+import Profile from '@/pages/profile/Profile';
 import NotFound from "../components/notFound/NotFound";
+import DashboardLayout from '../components/DashboardLayout ';
 
 import AuthGuard from '../guards/AuthGuard'; 
 
@@ -21,7 +23,10 @@ const AppRoutes = () => {
       <Route path="/register/artisan" element={<RegisterArtisan />} />
 
       <Route element={<AuthGuard />}>
-        <Route path="/dashboard" element={<Dashboard />} />
+       <Route element={<DashboardLayout />}>
+          <Route path="/artisan/dashboard" element={<Dashboard />} />
+          <Route path="/artisan/profile" element={<Profile />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<NotFound />} />
