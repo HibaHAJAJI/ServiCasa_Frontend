@@ -1,3 +1,4 @@
+// src/pages/artisan/DashboardArtisan.jsx
 import { useEffect, useState } from "react";
 
 import {
@@ -45,21 +46,33 @@ const DashboardArtisan = () => {
       title: "Nouvelles demandes",
       value: dashboard.nouvellesDemandes,
       icon: FaClipboardList,
+      // Couleurs spécifiques l'icône: Bleu
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-50",
     },
     {
       title: "Interventions en cours",
       value: dashboard.interventionsEnCours,
       icon: FaTools,
+      // Couleurs spécifiques l'icône: Orange/Amber
+      iconColor: "text-amber-600",
+      iconBg: "bg-amber-50",
     },
     {
       title: "Interventions terminées",
       value: dashboard.interventionsTerminees,
       icon: FaCheckCircle,
+      // Couleurs spécifiques l'icône: Vert/Emerald
+      iconColor: "text-emerald-600",
+      iconBg: "bg-emerald-50",
     },
     {
       title: "Revenus du mois",
       value: "0 DH",
       icon: FaMoneyBillWave,
+      // Couleurs spécifiques l'icône: Indigo/Purple
+      iconColor: "text-indigo-600",
+      iconBg: "bg-indigo-50",
     },
   ];
 
@@ -78,17 +91,19 @@ const DashboardArtisan = () => {
               return (
                 <Card
                   key={stat.title}
-                  className="border-gray-200 bg-white shadow-sm"
+                  className="border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow"
                 >
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium text-gray-500">
                       {stat.title}
                     </CardTitle>
-                    <Icon className="text-[#0B1F3A] text-lg" />
+                    <div className={`p-2.5 rounded-xl ${stat.iconBg}`}>
+                      <Icon className={`${stat.iconColor} text-lg`} />
+                    </div>
                   </CardHeader>
 
                   <CardContent>
-                    <p className="text-3xl font-bold text-[#0B1F3A]">
+                    <p className="text-3xl font-extrabold text-[#0B1F3A]">
                       {stat.value}
                     </p>
                   </CardContent>

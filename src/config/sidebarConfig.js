@@ -1,7 +1,6 @@
 import {
   FaHome,
-  FaUsers,
-  FaCalendarAlt,
+  FaClipboardList,
   FaTools
 
 } from "react-icons/fa";
@@ -9,30 +8,25 @@ import {
 const sidebarConfig = {
   CLIENT: [],
 
-  ARTISAN: [],
-
-  ADMIN: [
-     {
-      label: "Dashboard",
-      path: "/dashboard/admin",
+  ARTISAN: [
+    {
+      label: "Tableau de bord",
+      path: "/artisan/dashboard",
       icon: FaHome,
     },
     {
-      label: "Clients",
-      path: "/admin/clients",
-      icon: FaUsers,
+      label: "Nouvelles demandes",
+      path: "/artisan/demandes",
+      icon: FaClipboardList,
     },
     {
-      label: "Artisans",
-      path: "/admin/artisans",
+      label: "Interventions",
+      path: "/artisan/interventions",
       icon: FaTools,
     },
-    {
-      label: "Réservations",
-      path: "/admin/reservations",
-      icon: FaCalendarAlt,
-    },
   ],
+
+  ADMIN: [],
 };
 
 export default sidebarConfig;
