@@ -1,31 +1,38 @@
 import {
   FaHome,
-  FaSearch,
+  FaUsers,
   FaCalendarAlt,
+  FaTools
+
 } from "react-icons/fa";
 
 const sidebarConfig = {
-  CLIENT: [
-    {
-      label: "Tableau de bord",
-      path: "/client",
-      icon: FaHome,
-    },
-    {
-      label: "Rechercher un artisan",
-      path: "/client/artisans",
-      icon: FaSearch,
-    },
-    {
-      label: "Mes réservations",
-      path: "/client/reservations",
-      icon: FaCalendarAlt,
-    },
-  ],
+  CLIENT: [],
 
   ARTISAN: [],
 
-  ADMIN: [],
+  ADMIN: [
+     {
+      label: "Dashboard",
+      path: "/dashboard/admin",
+      icon: FaHome,
+    },
+    {
+      label: "Clients",
+      path: "/admin/clients",
+      icon: FaUsers,
+    },
+    {
+      label: "Artisans",
+      path: "/admin/artisans",
+      icon: FaTools,
+    },
+    {
+      label: "Réservations",
+      path: "/admin/reservations",
+      icon: FaCalendarAlt,
+    },
+  ],
 };
 
 export default sidebarConfig;

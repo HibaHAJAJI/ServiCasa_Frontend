@@ -6,7 +6,7 @@ import RegisterArtisan from '../pages/register/RegisterArtisan';
 import RegisterClient from '../pages/register/RegisterClient';
 
 
-import Dashboard from '../pages/dashboard/Dashboard';
+import Dashboard from '../pages/dashboard/DashboardArtisan';
 
 
 
