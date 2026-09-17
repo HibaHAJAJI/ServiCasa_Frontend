@@ -1,36 +1,37 @@
 import { useEffect, useState } from "react";
-
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import {
+  FaUsers,
+  FaUserTie,
+  FaUserShield,
   FaClipboardList,
-  FaTools,
   FaCheckCircle,
-  FaMoneyBillWave,
+  FaHourglassHalf,
 } from "react-icons/fa";
+import adminDashboardService from "../../services/adminDashboardService";
 
-import artisanDashboardService from "../../services/artisanDashboardService";
-
-const DashboardArtisan = () => {
+const DashboardAdmin = () => {
   const [dashboard, setDashboard] = useState({
-    nouvellesDemandes: 0,
-    interventionsEnCours: 0,
-    interventionsTerminees: 0,
+    totalUsers: 0,
+    totalClients: 0,
+    totalArtisans: 0,
+    totalReservations: 0,
+    pendingReservations: 0,
+    completedReservations: 0,
   });
 
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const artisanId = 1;
-        const data = await artisanDashboardService.getDashboard(artisanId);
+        const data = await adminDashboardService.getDashboard();
         setDashboard(data);
       } catch (error) {
-        console.error("Erreur dashboard :", error);
+        console.error("Erreur dashboard admin :", error);
       }
     };
 
@@ -39,38 +40,52 @@ const DashboardArtisan = () => {
 
   const stats = [
     {
-      title: "Nouvelles demandes",
-      value: dashboard.nouvellesDemandes,
-      icon: FaClipboardList,
+      title: "Total Utilisateurs",
+      value: dashboard.totalUsers,
+      icon: FaUsers,
       iconColor: "text-blue-600",
       iconBg: "bg-blue-50",
     },
     {
-      title: "Interventions en cours",
-      value: dashboard.interventionsEnCours,
-      icon: FaTools,
+      title: "Total Clients",
+      value: dashboard.totalClients,
+      icon: FaUserShield,
+      iconColor: "text-purple-600",
+      iconBg: "bg-purple-50",
+    },
+    {
+      title: "Total Artisans",
+      value: dashboard.totalArtisans,
+      icon: FaUserTie,
+      iconColor: "text-indigo-600",
+      iconBg: "bg-indigo-50",
+    },
+    {
+      title: "Total Réservations",
+      value: dashboard.totalReservations,
+      icon: FaClipboardList,
+      iconColor: "text-sky-600",
+      iconBg: "bg-sky-50",
+    },
+    {
+      title: "Réservations en attente",
+      value: dashboard.pendingReservations,
+      icon: FaHourglassHalf,
       iconColor: "text-amber-600",
       iconBg: "bg-amber-50",
     },
     {
-      title: "Interventions terminées",
-      value: dashboard.interventionsTerminees,
+      title: "Réservations terminées",
+      value: dashboard.completedReservations,
       icon: FaCheckCircle,
       iconColor: "text-emerald-600",
       iconBg: "bg-emerald-50",
-    },
-    {
-      title: "Revenus du mois",
-      value: "0 DH",
-      icon: FaMoneyBillWave,
-      iconColor: "text-indigo-600",
-      iconBg: "bg-indigo-50",
     },
   ];
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat) => {
           const Icon = stat.icon;
 
@@ -103,7 +118,7 @@ const DashboardArtisan = () => {
         <Card className="border-gray-200 bg-white shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg text-[#0B1F3A]">
-              Mes demandes récentes
+              Activité récente de la plateforme
             </CardTitle>
           </CardHeader>
 
@@ -111,16 +126,16 @@ const DashboardArtisan = () => {
             <div className="flex items-center justify-between border-b border-gray-100 py-4">
               <div>
                 <p className="font-medium text-[#0B1F3A]">
-                  Aucune demande récente
+                  Système opérationnel
                 </p>
 
                 <p className="text-sm text-gray-500">
-                  Les nouvelles demandes apparaîtront ici.
+                  Toutes les statistiques sont synchronisées en temps réel.
                 </p>
               </div>
 
-              <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">
-                Aucune
+              <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs text-emerald-700 font-semibold whitespace-nowrap">
+                Actif
               </span>
             </div>
           </CardContent>
@@ -130,4 +145,4 @@ const DashboardArtisan = () => {
   );
 };
 
-export default DashboardArtisan;
+export default DashboardAdmin;

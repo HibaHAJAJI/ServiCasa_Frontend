@@ -1,7 +1,10 @@
 import {
   FaHome,
   FaClipboardList,
-  FaTools
+  FaTools,
+  FaChartBar,
+  FaUsers,
+  FaUserShield,
 
 } from "react-icons/fa";
 
@@ -26,7 +29,22 @@ const sidebarConfig = {
     },
   ],
 
-  ADMIN: [],
-};
+ADMIN: [
+    {
+      label: "Tableau de bord",
+      path: "/admin/dashboard",
+      icon: FaChartBar,
+    },
+    {
+      label: "Gestion des Utilisateurs",
+      path: "",
+      icon: FaUsers,
+    },
+    {
+      label: "Validation des Artisans",
+      path: "",
+      icon: FaUserShield,
+    },
+  ],};
 
 export default sidebarConfig;

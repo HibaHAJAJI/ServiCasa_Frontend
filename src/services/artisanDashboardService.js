@@ -2,8 +2,8 @@ import api from "./axios";
 
 const artisanDashboardService = {
 
-  getDashboard: async (artisanId) => {
-    const response = await api.get("/dashboards/artisan", { params: { artisanId },});
+  getDashboard: async () => {
+    const response = await api.get("/dashboard/artisan");
     return response.data;
   },
 };
