@@ -6,6 +6,7 @@ import RegisterArtisan from '../pages/register/RegisterArtisan';
 import RegisterClient from '../pages/register/RegisterClient';
 
 import Dashboard from '../pages/dashboard/DashboardArtisan';
+import DemandesArtisan from '@/artisans/DemandesArtisan';
 import Profile from '@/pages/profile/Profile';
 import NotFound from "../components/notFound/NotFound";
 import DashboardLayout from "../components/DashboardLayout ";
@@ -25,6 +26,7 @@ const AppRoutes = () => {
       <Route element={<AuthGuard />}>
         <Route element={<DashboardLayout />}>
           <Route path="/artisan/dashboard" element={<Dashboard />} />
+          <Route path="/artisan/demandes" element={<DemandesArtisan />}/>
           <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>
