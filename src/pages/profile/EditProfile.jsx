@@ -20,19 +20,20 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const getProfile = async () => {
       try {
         const data = await userService.getCurrentUser();
+        console.log("PROFILE DATA :", data);
         setUser(data);
-        setFormData(data); 
+        setFormData(data);
       } catch (error) {
-        console.error("Erreur profile :", error);
+        console.error("Erreur :", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
+    getProfile();
   }, []);
 
   const handleChange = (event) => {
@@ -45,17 +46,21 @@ const Profile = () => {
     });
   };
 
+  const role = user?.role?.replace("ROLE_", "").toUpperCase();
+
   const handleSave = async () => {
     try {
       setSaving(true);
+      console.log("DONNÉES ENVOYÉES AU BACKEND :", formData);
+
       let updatedUser;
 
-      const userRole = user.role ? user.role.replace("ROLE_", "") : "";
-
-      if (userRole === "CLIENT") {
+      if (role === "CLIENT") {
         updatedUser = await userService.updateClientProfile(formData);
-      } else {
+      } else if (role === "ARTISAN") {
         updatedUser = await userService.updateArtisanProfile(formData);
+      } else {
+        updatedUser = await userService.updateProfile(formData);
       }
 
       setUser(updatedUser);
@@ -64,22 +69,22 @@ const Profile = () => {
 
       alert("Profil mis à jour avec succès !");
     } catch (error) {
-      console.error("Erreur modification :", error);
-      alert("Erreur lors de la modification du profil.");
+      console.error("Erreur :", error);
+      alert("Erreur lors de la mise à jour du profil.");
     } finally {
       setSaving(false);
     }
   };
 
   const handleCancel = () => {
-    setFormData(user); 
+    setFormData(user);
     setIsEditing(false);
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-[#0B1F3A] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-[#0B1F3A] rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -92,20 +97,20 @@ const Profile = () => {
     );
   }
 
-  const role = user.role ? user.role.replace("ROLE_", "") : "";
-  const initials = (user.prenom?.[0] || "") + (user.nom?.[0] || "");
+  const initials =
+    (user.prenom?.[0] || "") + (user.nom?.[0] || "");
 
   return (
     <div className="max-w-5xl mx-auto p-6">
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        
+
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="w-16 h-16 rounded-full bg-[#0B1F3A] text-white flex items-center justify-center text-xl font-bold">
-                {initials ? initials.toUpperCase() : "SC"}
+                {initials || "SC"}
               </div>
-              <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
+              <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></span>
             </div>
 
             <div>
@@ -158,7 +163,7 @@ const Profile = () => {
             <EditableField
               label="Prénom"
               name="prenom"
-              value={formData.prenom}
+              value={isEditing ? formData.prenom : (user?.prenom || formData.prenom)}
               isEditing={isEditing}
               onChange={handleChange}
             />
@@ -166,7 +171,7 @@ const Profile = () => {
             <EditableField
               label="Nom"
               name="nom"
-              value={formData.nom}
+              value={isEditing ? formData.nom : (user?.nom || formData.nom)}
               isEditing={isEditing}
               onChange={handleChange}
             />
@@ -174,7 +179,7 @@ const Profile = () => {
             <EditableField
               label="Ville"
               name="ville"
-              value={formData.ville}
+              value={isEditing ? formData.ville : (user?.ville || formData.ville)}
               icon={<FaMapMarkerAlt />}
               isEditing={isEditing}
               onChange={handleChange}
@@ -185,13 +190,13 @@ const Profile = () => {
               name="email"
               value={formData.email}
               icon={<FaEnvelope />}
-              isEditing={false} 
+              isEditing={false}
             />
 
             <EditableField
               label="Téléphone"
               name="telephone"
-              value={formData.telephone}
+              value={isEditing ? formData.telephone : (user?.telephone || formData.telephone)}
               icon={<FaPhone />}
               isEditing={isEditing}
               onChange={handleChange}
@@ -210,7 +215,7 @@ const Profile = () => {
               <EditableField
                 label="Spécialité"
                 name="specialite"
-                value={formData.specialite}
+                value={isEditing ? formData.specialite : (user?.specialite || formData.specialite)}
                 isEditing={isEditing}
                 onChange={handleChange}
               />
@@ -219,7 +224,7 @@ const Profile = () => {
                 label="Années d'expérience"
                 name="anneesExperience"
                 type="number"
-                value={formData.anneesExperience}
+                value={isEditing ? formData.anneesExperience : (user?.anneesExperience || formData.anneesExperience)}
                 isEditing={isEditing}
                 onChange={handleChange}
               />
@@ -228,7 +233,7 @@ const Profile = () => {
                 label="Tarif horaire"
                 name="tarifHoraire"
                 type="number"
-                value={formData.tarifHoraire}
+                value={isEditing ? formData.tarifHoraire : (user?.tarifHoraire || formData.tarifHoraire)}
                 isEditing={isEditing}
                 onChange={handleChange}
               />
@@ -236,7 +241,7 @@ const Profile = () => {
               <EditableField
                 label="Zone d'intervention"
                 name="zoneIntervention"
-                value={formData.zoneIntervention}
+                value={isEditing ? formData.zoneIntervention : (user?.zoneIntervention || formData.zoneIntervention)}
                 isEditing={isEditing}
                 onChange={handleChange}
               />
@@ -253,7 +258,7 @@ const Profile = () => {
                   />
                 ) : (
                   <p className="text-sm text-slate-700">
-                    {user.description || "Aucune description"}
+                    {user?.description || formData.description || "Aucune description"}
                   </p>
                 )}
               </div>
@@ -271,7 +276,8 @@ const Profile = () => {
             <EditableField
               label="Adresse"
               name="adresse"
-              value={formData.adresse}
+              value={isEditing ? formData.adresse : (user?.adresse || formData.adresse)}
+              icon={<FaMapMarkerAlt />}
               isEditing={isEditing}
               onChange={handleChange}
             />

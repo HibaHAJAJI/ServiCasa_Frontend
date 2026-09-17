@@ -13,7 +13,7 @@ const NotFound = () => {
         
         <div className="pt-4">
           <Link
-            to="/dashboard"
+            to="/profile"
             className="inline-flex items-center justify-center px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-xs"
           >
             Return to website
