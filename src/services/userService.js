@@ -1,23 +1,23 @@
-import API from "./axios";
+import api from "./axios";
 
 const userService = {
   getCurrentUser: async () => {
-    const response = await API.get("users/profile");
+    const response = await api.get("users/profile");
     return response.data;
   },
 
   updateProfile: async (data) => {
-  const response = await API.put("/users/profile", data);
+  const response = await api.put("/users/profile", data);
   return response.data;
 },
 
   updateClientProfile: async (data) => {
-    const response = await API.put("/users/client/profile", data);
+    const response = await api.put("/users/client/profile", data);
     return response.data;
   },
 
   updateArtisanProfile: async (data) => {
-    const response = await API.put("/users/artisan/profile", data);
+    const response = await api.put("/users/artisan/profile", data);
     return response.data;
   },
 

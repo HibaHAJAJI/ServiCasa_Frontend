@@ -19,22 +19,22 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const data = await userService.getCurrentUser();
-        setUser(data);
-        setFormData(data); 
-      } catch (error) {
-        console.error("Erreur profile :", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const data = await userService.getCurrentUser();
 
-    fetchUser();
-  }, []);
+      setUser(data);
+      setFormData(data);
+    } catch (error) {
+      console.error("Erreur profile :", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  fetchUser();
+}, []);
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
