@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import {
   FaUsers,
   FaUserTie,
@@ -13,8 +15,10 @@ import {
   FaCheckCircle,
   FaHourglassHalf,
 } from "react-icons/fa";
+
 import adminDashboardService from "../../services/adminDashboardService";
 import LatestReservationsAdmin from "../admin/LatestReservationsAdmin";
+import PendingArtisansAdmin from "../admin/PendingArtisansAdmin";
 
 const DashboardAdmin = () => {
   const [dashboard, setDashboard] = useState({
@@ -93,14 +97,14 @@ const DashboardAdmin = () => {
           return (
             <Card
               key={stat.title}
-              className="border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow"
+              className="border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
             >
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-gray-500">
                   {stat.title}
                 </CardTitle>
 
-                <div className={`p-2.5 rounded-xl ${stat.iconBg}`}>
+                <div className={`rounded-xl p-2.5 ${stat.iconBg}`}>
                   <Icon className={`${stat.iconColor} text-lg`} />
                 </div>
               </CardHeader>
@@ -115,10 +119,21 @@ const DashboardAdmin = () => {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 w-full">
+        
+        <div className="space-y-3">
+          <h3 className="text-base font-bold text-[#0B1F3A] px-1">
+            Dernières réservations
+          </h3>
           <LatestReservationsAdmin />
         </div>
+        <div className="space-y-3">
+          <h3 className="text-base font-bold text-[#0B1F3A] px-1">
+            Validation des artisans
+          </h3>
+          <PendingArtisansAdmin />
+        </div>
+
       </div>
     </div>
   );
