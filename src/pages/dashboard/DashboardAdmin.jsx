@@ -119,34 +119,6 @@ const DashboardAdmin = () => {
         <div className="lg:col-span-2">
           <LatestReservationsAdmin />
         </div>
-
-        <div>
-          <Card className="border-gray-200 bg-white shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg text-[#0B1F3A]">
-                Activité récente de la plateforme
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              <div className="flex items-center justify-between border-b border-gray-100 py-4">
-                <div>
-                  <p className="font-medium text-[#0B1F3A]">
-                    Système opérationnel
-                  </p>
-
-                  <p className="text-sm text-gray-500">
-                    Toutes les statistiques sont synchronisées en temps réel.
-                  </p>
-                </div>
-
-                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs text-emerald-700 font-semibold whitespace-nowrap">
-                  Actif
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
