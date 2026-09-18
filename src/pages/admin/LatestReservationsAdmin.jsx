@@ -42,14 +42,12 @@ const LatestReservationsAdmin = () => {
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
 
-      {/* Titre */}
       <div className="px-6 py-4 border-b border-slate-200">
         <h3 className="text-lg font-semibold text-[#0B1F3A]">
           Dernières réservations
         </h3>
       </div>
 
-      {/* Tableau */}
       <div className="overflow-x-auto">
         <Table>
 
@@ -82,24 +80,20 @@ const LatestReservationsAdmin = () => {
                 className="border-b border-slate-100 last:border-0 hover:bg-slate-50/70 transition-colors"
               >
 
-                {/* Client */}
                 <TableCell className="px-6 py-3.5">
                   <span className="font-medium text-[#0B1F3A]">
                     {item.clientNom}
                   </span>
                 </TableCell>
 
-                {/* Artisan */}
                 <TableCell className="px-6 py-3.5 text-sm text-slate-600">
                   {item.artisanNom || "Non assigné"}
                 </TableCell>
 
-                {/* Date */}
                 <TableCell className="px-6 py-3.5 text-sm text-slate-600">
                   {item.dateReservation}
                 </TableCell>
 
-                {/* Statut */}
                 <TableCell className="px-6 py-3.5 text-right">
                   <span
                     className={`inline-flex min-w-[90px] justify-center rounded-full px-3 py-1 text-xs font-medium
