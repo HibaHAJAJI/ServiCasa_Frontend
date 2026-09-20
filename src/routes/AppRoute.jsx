@@ -27,8 +27,8 @@ const AppRoutes = () => {
 
       <Route element={<AuthGuard />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/artisan/dashboard" element={<Dashboard />} />
-         <Route path="/admin/dashboard" element={<DashboardAdmin />} />
+          <Route path="/dashboard/artisan" element={<Dashboard />} />
+         <Route path="/dashboard/admin" element={<DashboardAdmin />} />
           <Route path="/artisan/demandes" element={<DemandesArtisan />}/>
           <Route path="/profile" element={<Profile />} />
         </Route>

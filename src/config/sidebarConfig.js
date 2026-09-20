@@ -3,8 +3,8 @@ import {
   FaClipboardList,
   FaTools,
   FaChartBar,
-  FaUsers,
   FaUserShield,
+  FaFolder,
 
 } from "react-icons/fa";
 
@@ -14,7 +14,7 @@ const sidebarConfig = {
   ARTISAN: [
     {
       label: "Tableau de bord",
-      path: "/artisan/dashboard",
+      path: "/dashboard/artisan",
       icon: FaHome,
     },
     {
@@ -30,21 +30,28 @@ const sidebarConfig = {
   ],
 
 ADMIN: [
-    {
-      label: "Tableau de bord",
-      path: "/admin/dashboard",
-      icon: FaChartBar,
-    },
-    {
-      label: "Gestion des Utilisateurs",
-      path: "",
-      icon: FaUsers,
-    },
-    {
-      label: "Validation des Artisans",
-      path: "",
-      icon: FaUserShield,
-    },
-  ],};
+  {
+    label: "Tableau de bord",
+    path: "/dashboard/admin",
+    icon: FaChartBar,
+  },
+  {
+    label: "Validation des Artisans",
+    path: "/admin/artisans/validation",
+    icon: FaUserShield,
+  },
+  {
+    label: "Gestion des Catégories",
+    path: "/admin/categories",
+    icon: FaFolder,
+  },
+  {
+    label: "Réservations",
+    path: "/admin/reservations",
+    icon: FaClipboardList,
+  },
+
+],
+};
 
 export default sidebarConfig;

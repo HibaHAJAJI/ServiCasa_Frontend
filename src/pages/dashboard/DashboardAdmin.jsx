@@ -120,18 +120,25 @@ const DashboardAdmin = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 w-full">
-        
-        <div className="space-y-3">
+
+        <div className="min-w-0 space-y-3">
           <h3 className="text-base font-bold text-[#0B1F3A] px-1">
             Dernières réservations
           </h3>
-          <LatestReservationsAdmin />
+
+          <div className="w-full overflow-x-auto">
+            <LatestReservationsAdmin />
+          </div>
         </div>
-        <div className="space-y-3">
+
+        <div className="min-w-0 space-y-3">
           <h3 className="text-base font-bold text-[#0B1F3A] px-1">
             Validation des artisans
           </h3>
-          <PendingArtisansAdmin />
+
+          <div className="w-full overflow-x-auto">
+            <PendingArtisansAdmin />
+          </div>
         </div>
 
       </div>
