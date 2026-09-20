@@ -12,13 +12,16 @@ import DemandesArtisan from '@/artisans/DemandesArtisan';
 import Profile from '@/pages/profile/Profile';
 import NotFound from "../components/notFound/NotFound";
 import DashboardLayout from "../components/DashboardLayout ";
+import PublicNavbar from '@/components/navbar/PublicNavbar';
 
 import AuthGuard from '../guards/AuthGuard';
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/publicNavbar" replace />} />
+            <Route path="/publicNavbar" element={<PublicNavbar />} />
+
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<RegisterSelection />} />
