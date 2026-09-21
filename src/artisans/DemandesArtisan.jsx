@@ -57,7 +57,7 @@ const DemandesArtisan = () => {
   const handleAccepter = async (id) => {
     try {
       setActionLoading(id);
-      await reservationService.updateReservationStatus(id, "ACCEPTED");
+      await reservationService.updateReservationStatus(id, "ACCEPTEE");
       setDemandes(demandes.filter((d) => d.id !== id));
       if (selectedDemande?.id === id) closeDetails();
     } catch (err) {
@@ -71,7 +71,7 @@ const DemandesArtisan = () => {
   const handleRefuser = async (id) => {
     try {
       setActionLoading(id);
-      await reservationService.updateReservationStatus(id, "REFUSED");
+      await reservationService.updateReservationStatus(id, "REFUSEE");
       setDemandes(demandes.filter((d) => d.id !== id));
       if (selectedDemande?.id === id) closeDetails();
     } catch (err) {
@@ -135,7 +135,7 @@ const DemandesArtisan = () => {
               {demandes.map((demande) => (
                 <TableRow key={demande.id} className="hover:bg-slate-50/50">
                   <TableCell className="py-4 px-6 font-semibold text-slate-800">
-                    {demande.clientNom || "Client"}
+                    {demande.clientPrenom ? `${demande.clientPrenom} ${demande.clientNom || ""}` : demande.clientNom || "Client"}
                   </TableCell>
                   <TableCell className="py-4 px-6 text-slate-600">
                     {demande.dateReservation || "Non disponible"}
@@ -189,7 +189,9 @@ const DemandesArtisan = () => {
                 </div>
                 <div>
                   <span className="text-xs text-slate-400 block">Nom du Client</span>
-                  <strong className="text-slate-800 font-semibold">{selectedDemande.clientNom || "Client"}</strong>
+                  <strong className="text-slate-800 font-semibold">
+                    {selectedDemande.clientPrenom ? `${selectedDemande.clientPrenom} ${selectedDemande.clientNom || ""}` : selectedDemande.clientNom || "Client"}
+                  </strong>
                 </div>
               </div>
 

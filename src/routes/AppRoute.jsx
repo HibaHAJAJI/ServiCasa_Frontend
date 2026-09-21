@@ -7,9 +7,11 @@ import RegisterClient from '../pages/register/RegisterClient';
 
 import Dashboard from '../pages/dashboard/DashboardArtisan';
 import DashboardAdmin from '@/pages/dashboard/DashboardAdmin';
+import DashboardClient from '@/pages/dashboard/DashboardClient';
 
 import DemandesArtisan from '@/artisans/DemandesArtisan';
 import Profile from '@/pages/profile/Profile';
+import MesReservations from '@/pages/client/MesReservations';
 import NotFound from "../components/notFound/NotFound";
 import DashboardLayout from "../components/DashboardLayout";
 import Home from '@/pages/Home';
@@ -34,9 +36,14 @@ const AppRoutes = () => {
       <Route element={<AuthGuard />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard/artisan" element={<Dashboard />} />
-          <Route path="/dashboard/admin" element={<DashboardAdmin />} />
           <Route path="/artisan/demandes" element={<DemandesArtisan />} />
           <Route path="/profile" element={<Profile />} />
+
+          <Route path="/dashboard/admin" element={<DashboardAdmin />} />
+
+          <Route path="/client/dashboard" element={<DashboardClient />} />
+          <Route path="/client/reservations" element={<MesReservations />} />
+          <Route path="/client/profile" element={<Profile />} />
         </Route>
       </Route>
 

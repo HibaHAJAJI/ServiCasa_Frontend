@@ -43,7 +43,7 @@ const Login = () => {
 
       login(response.token);
 
-      const from = location.state?.from?.pathname || "/dashboard";
+      const from = location.state?.from?.pathname || location.state?.from || "/dashboard";
       navigate(from);
     } catch (error) {
       setServerError("Email ou mot de passe incorrect.",error);

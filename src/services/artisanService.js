@@ -8,6 +8,11 @@ const artisanService = {
     return response.data;
   },
 
+  getById: async (id) => {
+    const response = await api.get(`/artisans/${id}`);
+    return response.data;
+  },
+
   findBySpecialite: async (specialite, page = 0, size = 50) => {
     const response = await api.get(
       `/artisans/specialite?specialite=${encodeURIComponent(specialite)}&page=${page}&size=${size}`

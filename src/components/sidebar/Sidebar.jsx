@@ -9,6 +9,8 @@ const Sidebar = ({ isOpen, onClose }) => {
   const role = user?.role ? user.role.replace("ROLE_", "").toUpperCase() : "ARTISAN";
   const menuItems = sidebarConfig[role] || [];
 
+  const profilePath = role === "CLIENT" ? "/client/profile" : "/profile";
+
   return (
     <aside 
       className={`w-64 h-[calc(100vh-70px)] bg-white border-r border-slate-200 fixed left-0 top-[70px] flex flex-col justify-between z-40 transition-transform duration-300 ease-in-out shadow-lg md:shadow-none ${
@@ -22,7 +24,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             <NavLink
               key={item.path}
               to={item.path}
-              end={item.path === "/artisan/dashboard"}
+              end={item.path === "/artisan/dashboard" || item.path === "/client/dashboard"}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
                   isActive
@@ -37,9 +39,9 @@ const Sidebar = ({ isOpen, onClose }) => {
           );
         })}
 
-        {/* Mon profil m-zida b nfs l'style original */}
+        {/* Mon profil — chemin dynamique selon le rôle */}
         <NavLink
-          to="/artisan/profile"
+          to={profilePath}
           onClick={onClose}
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
@@ -71,4 +73,4 @@ const Sidebar = ({ isOpen, onClose }) => {
   );
 };
 
-export default Sidebar;
+export default Sidebar;

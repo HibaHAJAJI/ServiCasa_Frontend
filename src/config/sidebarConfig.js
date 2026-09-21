@@ -5,11 +5,22 @@ import {
   FaChartBar,
   FaUserShield,
   FaFolder,
-
+  FaCalendarAlt,
 } from "react-icons/fa";
 
 const sidebarConfig = {
-  CLIENT: [],
+  CLIENT: [
+    {
+      label: "Tableau de bord",
+      path: "/client/dashboard",
+      icon: FaHome,
+    },
+    {
+      label: "Mes réservations",
+      path: "/client/reservations",
+      icon: FaCalendarAlt,
+    },
+  ],
 
   ARTISAN: [
     {
@@ -54,4 +65,4 @@ ADMIN: [
 ],
 };
 
-export default sidebarConfig;
+export default sidebarConfig;

@@ -14,7 +14,8 @@ import {
   FaMoneyBillWave,
 } from "react-icons/fa";
 
-import artisanDashboardService from "../../services/artisanDashboardService";
+import artisanDashboardService from "@/services/artisanDashboardService";
+import reservationService from "@/services/reservationService";
 
 const DashboardArtisan = () => {
   const [dashboard, setDashboard] = useState({
@@ -23,11 +24,17 @@ const DashboardArtisan = () => {
     interventionsTerminees: 0,
   });
 
+  const [demandes, setDemandes] = useState([]);
+  const [loadingDemandes, setLoadingDemandes] = useState(true);
+
   useEffect(() => {
     const loadDashboard = async () => {
       try {
         const artisanId = 1;
-        const data = await artisanDashboardService.getDashboard(artisanId);
+
+        const data =
+          await artisanDashboardService.getDashboard(artisanId);
+
         setDashboard(data);
       } catch (error) {
         console.error("Erreur dashboard :", error);
@@ -35,6 +42,24 @@ const DashboardArtisan = () => {
     };
 
     loadDashboard();
+  }, []);
+
+  useEffect(() => {
+    const loadDemandes = async () => {
+      try {
+        const data =
+          await reservationService.getPendingReservations();
+
+        setDemandes(data?.content || []);
+      } catch (error) {
+        console.error("Erreur chargement demandes :", error);
+        setDemandes([]);
+      } finally {
+        setLoadingDemandes(false);
+      }
+    };
+
+    loadDemandes();
   }, []);
 
   const stats = [
@@ -77,14 +102,14 @@ const DashboardArtisan = () => {
           return (
             <Card
               key={stat.title}
-              className="border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow"
+              className="border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
             >
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-gray-500">
                   {stat.title}
                 </CardTitle>
 
-                <div className={`p-2.5 rounded-xl ${stat.iconBg}`}>
+                <div className={`rounded-xl p-2.5 ${stat.iconBg}`}>
                   <Icon className={`${stat.iconColor} text-lg`} />
                 </div>
               </CardHeader>
@@ -108,21 +133,83 @@ const DashboardArtisan = () => {
           </CardHeader>
 
           <CardContent>
-            <div className="flex items-center justify-between border-b border-gray-100 py-4">
-              <div>
+            {loadingDemandes ? (
+              <div className="py-6 text-center">
+                <p className="text-sm text-gray-500">
+                  Chargement des demandes...
+                </p>
+              </div>
+            ) : demandes.length === 0 ? (
+              <div className="py-6 text-center">
                 <p className="font-medium text-[#0B1F3A]">
                   Aucune demande récente
                 </p>
 
-                <p className="text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-500">
                   Les nouvelles demandes apparaîtront ici.
                 </p>
               </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="px-4 py-3 text-sm font-semibold text-gray-500">
+                        Client
+                      </th>
 
-              <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">
-                Aucune
-              </span>
-            </div>
+                      <th className="px-4 py-3 text-sm font-semibold text-gray-500">
+                        Problème
+                      </th>
+
+                      <th className="px-4 py-3 text-sm font-semibold text-gray-500">
+                        Date
+                      </th>
+
+                      <th className="px-4 py-3 text-sm font-semibold text-gray-500">
+                        Statut
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {demandes.slice(0, 3).map((demande) => (
+                      <tr
+                        key={demande.id}
+                        className="border-b border-gray-50 last:border-0"
+                      >
+                        <td className="px-4 py-4">
+                          <p className="font-medium text-[#0B1F3A]">
+                            {demande.clientPrenom} {demande.clientNom}
+                          </p>
+                        </td>
+
+                        <td className="max-w-xs px-4 py-4">
+                          <p className="truncate text-sm text-gray-600">
+                            {demande.descriptionProbleme ||
+                              "Aucune description"}
+                          </p>
+                        </td>
+
+                        <td className="px-4 py-4 text-sm text-gray-500">
+                          {demande.dateIntervention
+                            ? new Date(
+                                demande.dateIntervention
+                              ).toLocaleDateString("fr-FR")
+                            : "Date non définie"}
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
+                            En attente
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
