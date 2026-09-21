@@ -5,6 +5,7 @@ import Hero from "../components/Hero";
 import NearbyArtisans from "@/components/NearbyArtisans";
 import artisanService from "@/services/artisanService";
 import HowItWorks from "@/components/HowItWorks";
+import Footer from "@/components/Footer";
 
 const normalizeArtisan = (artisan) => ({
   id: artisan?.id,
@@ -134,6 +135,7 @@ const Home = () => {
         error={error}
       />
       <HowItWorks/>
+      <Footer/>
     </>
   );
 };
