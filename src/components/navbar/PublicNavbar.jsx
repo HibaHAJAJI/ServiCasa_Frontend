@@ -26,19 +26,19 @@ const PublicNavbar = () => {
             Accueil
           </Link>
 
-          <Link
-            to="/artisans"
+          <a
+            href="/#artisans"
             className="text-slate-600 font-medium hover:text-[#0B1F3A] transition"
           >
             Artisans
-          </Link>
+          </a>
 
-          <Link
-            to="/#comment-ca-marche"
+          <a
+            href="/#comment-ca-marche"
             className="text-slate-600 font-medium hover:text-[#0B1F3A] transition"
           >
             Comment ça marche
-          </Link>
+          </a>
         </nav>
 
         <div className="hidden md:flex items-center gap-5">
@@ -79,21 +79,21 @@ const PublicNavbar = () => {
               Accueil
             </Link>
 
-            <Link
-              to="/artisans"
+            <a
+              href="/#artisans"
               onClick={closeMenu}
               className="py-2 text-slate-600 font-medium"
             >
               Artisans
-            </Link>
+            </a>
 
-            <Link
-              to="/comment-ca-marche"
+            <a
+              href="/#comment-ca-marche"
               onClick={closeMenu}
               className="py-2 text-slate-600 font-medium"
             >
               Comment ça marche
-            </Link>
+            </a>
 
             <div className="border-t border-slate-200 pt-4 flex flex-col gap-3">
               <Link

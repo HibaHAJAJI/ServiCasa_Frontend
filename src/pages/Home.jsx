@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 import PublicNavbar from "../components/navbar/PublicNavbar";
 import Hero from "../components/Hero";
 import NearbyArtisans from "@/components/NearbyArtisans";
 import artisanService from "@/services/artisanService";
 import HowItWorks from "@/components/HowItWorks";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/context/AuthContext";
 
 const normalizeArtisan = (artisan) => ({
   id: artisan?.id,
@@ -13,12 +15,7 @@ const normalizeArtisan = (artisan) => ({
   nom: artisan?.nom,
   specialite: artisan?.specialite,
   ville: artisan?.ville,
-  tarif: artisan?.tarifHoraire,
-  note: artisan?.note,
-  disponible: artisan?.disponible,
-  latitude: artisan?.latitude,
-  longitude: artisan?.longitude,
-  verified: artisan?.verified,
+  tarifHoraire: artisan?.tarifHoraire,
 });
 
 const reverseGeocode = async (latitude, longitude) => {
@@ -50,9 +47,9 @@ const reverseGeocode = async (latitude, longitude) => {
 
 const Home = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const [results, setResults] = useState([]);
-  const [mapTarget, setMapTarget] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [locating, setLocating] = useState(false);
@@ -77,6 +74,27 @@ const Home = () => {
     }
   };
 
+  useEffect(() => {
+    const loadArtisans = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const res = await artisanService.searchArtisans("", "");
+        const items = res?.content ?? [];
+
+        setResults(items.map(normalizeArtisan));
+      } catch {
+        setError("Impossible de charger les artisans.");
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadArtisans();
+  }, []);
+
   const handleUseMyPosition = async (onVille) => {
     if (!navigator.geolocation) {
       setError(
@@ -100,9 +118,8 @@ const Home = () => {
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
 
-      setMapTarget({ latitude, longitude });
-
       const ville = await reverseGeocode(latitude, longitude);
+
       if (ville) {
         onVille?.(ville);
       }
@@ -116,26 +133,39 @@ const Home = () => {
   };
 
   const handleViewProfile = (id) => {
-    navigate(`/artisans/${id}`);
+    if (isAuthenticated) {
+      navigate(`/artisans/${id}`);
+    } else {
+      navigate("/login", {
+        state: {
+          from: {
+            pathname: `/artisans/${id}`,
+          },
+        },
+      });
+    }
   };
 
   return (
     <>
       <PublicNavbar />
+
       <Hero
         onSearch={handleSearch}
         onUseMyPosition={handleUseMyPosition}
         locating={locating}
       />
+
       <NearbyArtisans
         artisans={results}
         onViewProfile={handleViewProfile}
-        mapTarget={mapTarget}
         loading={loading}
         error={error}
       />
-      <HowItWorks/>
-      <Footer/>
+
+      <HowItWorks />
+
+      <Footer />
     </>
   );
 };

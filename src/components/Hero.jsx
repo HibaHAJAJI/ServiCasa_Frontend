@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { FaSearch, FaMapMarkerAlt, FaTools, FaStar } from "react-icons/fa";
 
 import heroImage from "../assets/image.png";
@@ -103,12 +102,12 @@ const Hero = ({ onSearch, onUseMyPosition, locating }) => {
               </div>
 
               <div className="mt-6">
-                <Link
-                  to="/comment-ca-marche"
+                <a
+                  href="/#comment-ca-marche"
                   className="text-sm font-semibold text-[#0B1F3A] hover:text-red-500 transition"
                 >
                   Découvrir comment ça marche →
-                </Link>
+                </a>
               </div>
             </div>
 

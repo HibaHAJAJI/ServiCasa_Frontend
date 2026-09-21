@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -19,6 +19,7 @@ import "./Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +43,8 @@ const Login = () => {
 
       login(response.token);
 
-      navigate("/dashboard");
+      const from = location.state?.from?.pathname || "/dashboard";
+      navigate(from);
     } catch (error) {
       setServerError("Email ou mot de passe incorrect.",error);
     } finally {

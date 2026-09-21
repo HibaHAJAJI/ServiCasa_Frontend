@@ -30,7 +30,7 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="bg-slate-50 py-14">
+    <section id="comment-ca-marche" className="bg-slate-50 py-14">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
 
         <div className="mb-10 text-center">

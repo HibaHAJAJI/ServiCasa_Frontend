@@ -11,17 +11,20 @@ import DashboardAdmin from '@/pages/dashboard/DashboardAdmin';
 import DemandesArtisan from '@/artisans/DemandesArtisan';
 import Profile from '@/pages/profile/Profile';
 import NotFound from "../components/notFound/NotFound";
-import DashboardLayout from "../components/DashboardLayout ";
+import DashboardLayout from "../components/DashboardLayout";
 import Home from '@/pages/Home';
+import Artisans from '@/pages/Artisans';
+import ArtisanProfile from '@/pages/ArtisanProfile';
 
 import AuthGuard from '../guards/AuthGuard';
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<Home />} />
-
+      <Route path="/" element={<Home />} />
+      <Route path="/home" element={<Navigate to="/" replace />} />
+      <Route path="/artisans" element={<Artisans />} />
+      <Route path="/artisans/:id" element={<ArtisanProfile />} />
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<RegisterSelection />} />
@@ -31,8 +34,8 @@ const AppRoutes = () => {
       <Route element={<AuthGuard />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard/artisan" element={<Dashboard />} />
-         <Route path="/dashboard/admin" element={<DashboardAdmin />} />
-          <Route path="/artisan/demandes" element={<DemandesArtisan />}/>
+          <Route path="/dashboard/admin" element={<DashboardAdmin />} />
+          <Route path="/artisan/demandes" element={<DemandesArtisan />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>

@@ -6,7 +6,7 @@ import { MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import ArtisanCard from "./ArtisanCard";
 
-const ArtisanMap = ({ artisans = [] }) => {
+const ArtisanMap = () => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -29,28 +29,6 @@ const ArtisanMap = ({ artisans = [] }) => {
     ).addTo(map);
 
     map.setView([31.7917, -7.0926], 6);
-
-    artisans.forEach((artisan) => {
-      const latitude = parseFloat(artisan.latitude);
-      const longitude = parseFloat(artisan.longitude);
-
-      if (isNaN(latitude) || isNaN(longitude)) {
-        return;
-      }
-
-      const nom =
-        `${artisan.prenom || ""} ${artisan.nom || ""}`.trim();
-
-      L.marker([latitude, longitude])
-        .addTo(map)
-        .bindPopup(`
-          <strong>${nom || "Artisan"}</strong>
-          <br />
-          ${artisan.specialite || ""}
-          <br />
-          ${artisan.ville || ""}
-        `);
-    });
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -77,7 +55,7 @@ const ArtisanMap = ({ artisans = [] }) => {
 
       map.remove();
     };
-  }, [artisans]);
+  }, []);
 
   return (
     <div
@@ -96,9 +74,8 @@ const NearbyArtisans = ({
   const nearbyArtisans = artisans.slice(0, 4);
 
   return (
-    <section className="bg-white py-10 sm:py-12">
+    <section id="artisans" className="bg-white py-10 sm:py-12">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-
         <div className="mb-6">
           <h2 className="text-xl font-bold text-[#0B1F3A] sm:text-2xl">
             Artisans près de chez vous
@@ -110,9 +87,7 @@ const NearbyArtisans = ({
         </div>
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
-
           <div className="min-w-0 space-y-3">
-
             {loading && (
               <Card>
                 <CardContent className="p-8 text-center">
@@ -166,9 +141,8 @@ const NearbyArtisans = ({
               </span>
             </div>
 
-            <ArtisanMap artisans={nearbyArtisans} />
+            <ArtisanMap />
           </Card>
-
         </div>
       </div>
     </section>
