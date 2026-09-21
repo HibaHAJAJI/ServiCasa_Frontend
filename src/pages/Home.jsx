@@ -4,6 +4,7 @@ import PublicNavbar from "../components/navbar/PublicNavbar";
 import Hero from "../components/Hero";
 import NearbyArtisans from "@/components/NearbyArtisans";
 import artisanService from "@/services/artisanService";
+import HowItWorks from "@/components/HowItWorks";
 
 const normalizeArtisan = (artisan) => ({
   id: artisan?.id,
@@ -132,6 +133,7 @@ const Home = () => {
         loading={loading}
         error={error}
       />
+      <HowItWorks/>
     </>
   );
 };

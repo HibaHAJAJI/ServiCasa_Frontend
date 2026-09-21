@@ -34,7 +34,7 @@ const PublicNavbar = () => {
           </Link>
 
           <Link
-            to="/comment-ca-marche"
+            to="/#comment-ca-marche"
             className="text-slate-600 font-medium hover:text-[#0B1F3A] transition"
           >
             Comment ça marche
