@@ -2,14 +2,14 @@ import api from "./axios";
 
 const artisanDashboardService = {
 
-  getDashboard: async () => {
-    const response = await api.get("/dashboard/artisan");
+  getDashboard: async (artisanId) => {
+    const response = await api.get("/dashboards/artisan", { params: { artisanId },});
     return response.data;
   },
   
     findBySpecialite: async (specialite, page = 0, size = 20) => {
     const response = await api.get(
-      `/artisans/specialite?specialite=${encodeURIComponent(specialite)}&page=${page}&size=${size}`
+     `/artisans/specialite?specialite=${encodeURIComponent(specialite)}&page=${page}&size=${size}`
     );
     return response.data;
   },

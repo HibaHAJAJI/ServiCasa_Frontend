@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
-import authService from "../services/authService";
+import authService from "../../services/authService";
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => {

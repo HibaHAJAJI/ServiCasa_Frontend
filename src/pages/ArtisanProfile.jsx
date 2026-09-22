@@ -4,7 +4,7 @@ import { Briefcase, Calendar, MapPin } from "lucide-react";
 
 import artisanService from "@/services/artisanService";
 import reservationService from "@/services/reservationService";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/auth/AuthContext";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

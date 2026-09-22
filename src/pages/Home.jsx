@@ -7,7 +7,7 @@ import NearbyArtisans from "@/components/NearbyArtisans";
 import artisanService from "@/services/artisanService";
 import HowItWorks from "@/components/HowItWorks";
 import Footer from "@/components/Footer";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/auth/AuthContext";
 
 const normalizeArtisan = (artisan) => ({
   id: artisan?.id,

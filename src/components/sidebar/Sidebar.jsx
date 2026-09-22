@@ -1,7 +1,7 @@
 // src/components/sidebar/Sidebar.jsx
 import { NavLink } from "react-router-dom";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/auth/AuthContext";
 import sidebarConfig from "../../config/sidebarConfig";
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -73,4 +73,4 @@ const Sidebar = ({ isOpen, onClose }) => {
   );
 };
 
-export default Sidebar;
+export default Sidebar;

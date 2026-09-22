@@ -10,6 +10,13 @@ const reservationService = {
     return response.data;
   },
 
+  getInterventions: async (page = 0, size = 10) => {
+    const response = await api.get(
+      `/reservations/artisan/interventions?page=${page}&size=${size}`
+    );
+    return response.data;
+  },
+
   getLatestReservations : async (page = 0, size = 5) => {
     const response = await api.get(`/reservations/latest?page=${page}&size=${size}`);
     return response.data;
@@ -25,8 +32,12 @@ const reservationService = {
     return response.data;
   },
 
-  updateReservationStatus: async (id, status) => {
-    const response = await api.patch(`/reservations/${id}/statut?statut=${status}`);
+  accepterReservation: async (id) => {
+    const response = await api.patch(`/reservations/${id}/accepter`);
+    return response.data;
+  },
+  refuserReservation: async (id) => {
+    const response = await api.patch(`/reservations/${id}/refuser`);
     return response.data;
   },
 

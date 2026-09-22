@@ -48,7 +48,7 @@ const DashboardClient = () => {
         const data = await reservationService.getMyReservations();
 
         if (active) {
-          setReservations(Array.isArray(data) ? data : []);
+          setReservations(data.content || []);
         }
       } catch (error) {
         console.error(error);
@@ -182,51 +182,76 @@ const DashboardClient = () => {
               </p>
             )}
 
-            {!loading &&
-              !error &&
-              dernieres.map((reservation) => (
-                <div
-                  key={reservation.id}
-                  className="flex items-center justify-between border-b border-gray-100 py-4 last:border-0"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-[#0B1F3A]">
-                      {reservation.artisanPrenom
-                        ? `${reservation.artisanPrenom} ${reservation.artisanNom}`
-                        : `Artisan #${reservation.artisanId}`}
+            {!loading && !error && dernieres.length > 0 && (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-left">
+                      <th className="px-4 py-3 font-medium text-slate-500">
+                        Artisan
+                      </th>
 
-                      {reservation.artisanSpecialite && (
-                        <span className="font-normal text-slate-400">
-                          {" "}
-                          - {reservation.artisanSpecialite}
-                        </span>
-                      )}
-                    </p>
+                      <th className="px-4 py-3 font-medium text-slate-500">
+                        Spécialité
+                      </th>
 
-                    <p className="mt-0.5 text-xs text-slate-500">
-                      {reservation.dateIntervention
-                        ? new Date(
-                            reservation.dateIntervention
-                          ).toLocaleDateString("fr-FR", {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          })
-                        : "Date non définie"}
-                    </p>
-                  </div>
+                      <th className="px-4 py-3 font-medium text-slate-500">
+                        Date
+                      </th>
 
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${
-                      statutColor[reservation.statutReservation] ||
-                      "bg-slate-100 text-slate-500"
-                    }`}
-                  >
-                    {statutLabel[reservation.statutReservation] ||
-                      reservation.statutReservation}
-                  </span>
-                </div>
-              ))}
+                      <th className="px-4 py-3 font-medium text-slate-500">
+                        Statut
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {dernieres.map((reservation) => (
+                      <tr
+                        key={reservation.id}
+                        className="border-b border-gray-100 last:border-0"
+                      >
+                        <td className="px-4 py-4 font-medium text-[#0B1F3A]">
+                          {reservation.artisanPrenom
+                            ? `${reservation.artisanPrenom} ${
+                                reservation.artisanNom || ""
+                              }`
+                            : `Artisan #${reservation.artisanId}`}
+                        </td>
+
+                        <td className="px-4 py-4 text-slate-600">
+                          {reservation.artisanSpecialite || "-"}
+                        </td>
+
+                        <td className="px-4 py-4 text-slate-600">
+                          {reservation.dateIntervention
+                            ? new Date(
+                                reservation.dateIntervention
+                              ).toLocaleDateString("fr-FR", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })
+                            : "Date non définie"}
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-medium ${
+                              statutColor[reservation.statutReservation] ||
+                              "bg-slate-100 text-slate-500"
+                            }`}
+                          >
+                            {statutLabel[reservation.statutReservation] ||
+                              reservation.statutReservation}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

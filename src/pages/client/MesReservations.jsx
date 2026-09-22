@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import reservationService from "@/services/reservationService";
 
@@ -35,7 +35,7 @@ const MesReservations = () => {
 
     try {
       const data = await reservationService.getMyReservations();
-      setReservations(data || []);
+              setReservations(data.content || []);
     } catch {
       setError(
         "Impossible de charger vos réservations. Veuillez réessayer."
@@ -56,7 +56,7 @@ const MesReservations = () => {
         const data = await reservationService.getMyReservations();
 
         if (active) {
-          setReservations(data || []);
+          setReservations(data.content || []);
         }
       } catch {
         if (active) {
