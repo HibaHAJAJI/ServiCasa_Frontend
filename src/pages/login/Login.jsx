@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -43,7 +44,27 @@ const Login = () => {
 
       login(response.token);
 
-      const from = location.state?.from?.pathname || location.state?.from || "/dashboard";
+      const requestedPath =
+        location.state?.from?.pathname ||
+        location.state?.from ||
+        null;
+
+      let defaultPath = "/client/dashboard";
+
+      try {
+        const decodedToken = jwtDecode(response.token);
+        const role = decodedToken.role?.replace("ROLE_", "").toUpperCase();
+
+        if (role === "ARTISAN") {
+          defaultPath = "/dashboard/artisan";
+        } else if (role === "ADMIN") {
+          defaultPath = "/dashboard/admin";
+        }
+      } catch (error) {
+        console.error("Impossible de lire le rôle du token:", error);
+      }
+
+      const from = requestedPath || defaultPath;
       navigate(from);
     } catch (error) {
       setServerError("Email ou mot de passe incorrect.",error);

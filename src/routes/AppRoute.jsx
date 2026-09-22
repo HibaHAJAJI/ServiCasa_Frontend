@@ -9,16 +9,16 @@ import Dashboard from '../pages/dashboard/DashboardArtisan';
 import DashboardAdmin from '@/pages/dashboard/DashboardAdmin';
 import DashboardClient from '@/pages/dashboard/DashboardClient';
 
-import DemandesArtisan from '@/artisans/DemandesArtisan';
-import InterventionsArtisan from '@/artisans/InterventionsArtisan';
-import AvisArtisan from '@/artisans/AvisArtisan';
+import DemandesArtisan from '@/pages/artisans/DemandesArtisan';
+import InterventionsArtisan from '@/pages/artisans/InterventionsArtisan';
+import AvisArtisan from '@/pages/artisans/AvisArtisan';
 import Profile from '@/pages/profile/Profile';
 import MesReservations from '@/pages/client/MesReservations';
 import NotFound from "../components/notFound/NotFound";
-import DashboardLayout from "../components/DashboardLayout";
+import DashboardLayout from "../pages/dashboard/DashboardLayout";
 import Home from '@/pages/Home';
-import Artisans from '@/pages/Artisans';
-import ArtisanProfile from '@/pages/ArtisanProfile';
+import Artisans from '@/pages/artisans/Artisans';
+import ArtisanProfile from '@/pages/artisans/ArtisanProfile';
 
 import AuthGuard from '../guards/AuthGuard';
 
@@ -46,6 +46,10 @@ const AppRoutes = () => {
           <Route path="/dashboard/admin" element={<DashboardAdmin />} />
 
           <Route path="/client/dashboard" element={<DashboardClient />} />
+          <Route
+            path="/dashboard/client"
+            element={<Navigate to="/client/dashboard" replace />}
+          />
           <Route path="/client/reservations" element={<MesReservations />} />
           <Route path="/client/profile" element={<Profile />} />
         </Route>

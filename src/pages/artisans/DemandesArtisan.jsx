@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import {
+  FaClipboardList,
   FaEye,
-  FaTools,
+  FaCheck,
+  FaTimes,
   FaUser,
   FaCalendarAlt,
   FaMapMarkerAlt,
-  FaEuroSign,
-  FaCheck,
 } from "react-icons/fa";
 
-import reservationService from "../services/reservationService";
+import reservationService from "../../services/reservationService";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,19 +29,16 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-const InterventionsArtisan = () => {
-  const [interventions, setInterventions] = useState([]);
+const DemandesArtisan = () => {
+  const [demandes, setDemandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
+  const [actionLoading, setActionLoading] = useState(null);
 
-  const [selectedIntervention, setSelectedIntervention] = useState(null);
+  const [selectedDemande, setSelectedDemande] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [notification, setNotification] = useState(null);
-  const [actionLoading, setActionLoading] = useState(null);
 
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
@@ -50,59 +47,73 @@ const InterventionsArtisan = () => {
     }, 4000);
   };
 
-  const fetchInterventions = async () => {
+  const fetchDemandes = async () => {
     try {
       setLoading(true);
-      const data = await reservationService.getInterventions(page, size);
-      setInterventions(Array.isArray(data) ? data : data.content || []);
-      setTotalPages(data.totalPages || 0);
+      const data = await reservationService.getPendingReservations();
+      setDemandes(Array.isArray(data) ? data : data.content || []);
     } catch (err) {
       console.error(err);
-      setError("Impossible de charger les interventions.");
+      setError("Impossible de charger les demandes.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchInterventions();
-  }, [page, size]);
+    fetchDemandes();
+  }, []);
 
-  const openDetails = (intervention) => {
-    setSelectedIntervention(intervention);
+  const handleAccepter = async (id) => {
+    if (actionLoading) return;
+    try {
+      setActionLoading(id);
+      await reservationService.accepterReservation(id);
+
+      showNotification("Demande acceptée avec succès.", "success");
+
+      setDemandes((prev) => prev.filter((d) => d.id !== id));
+
+      if (selectedDemande?.id === id) {
+        setSelectedDemande((prev) => prev ? { ...prev, statutReservation: "ACCEPTEE" } : null);
+      }
+    } catch (err) {
+      console.error(err);
+      showNotification("Impossible de modifier la réservation. Veuillez réessayer.", "error");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRefuser = async (id) => {
+    if (actionLoading) return;
+    try {
+      setActionLoading(id);
+        await reservationService.refuserReservation(id);
+
+      showNotification("Demande refusée.", "info");
+
+      setDemandes((prev) => prev.filter((d) => d.id !== id));
+
+      if (selectedDemande?.id === id) {
+        setSelectedDemande((prev) => prev ? { ...prev, statutReservation: "REFUSEE" } : null);
+      }
+    } catch (err) {
+      console.error(err);
+      showNotification("Impossible de modifier la réservation. Veuillez réessayer.", "error");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const openDetails = (demande) => {
+    setSelectedDemande(demande);
     setIsModalOpen(true);
   };
 
   const closeDetails = () => {
-    setSelectedIntervention(null);
+    setSelectedDemande(null);
     setIsModalOpen(false);
-  };
-
-  const handleTerminer = async (id) => {
-    if (actionLoading) return;
-    try {
-      setActionLoading(id);
-      await reservationService.terminerReservation(id);
-
-      showNotification("Intervention terminée avec succès.", "success");
-
-      setInterventions((prev) =>
-        prev.map((i) =>
-          i.id === id ? { ...i, statutReservation: "TERMINEE" } : i
-        )
-      );
-
-      if (selectedIntervention?.id === id) {
-        setSelectedIntervention((prev) =>
-          prev ? { ...prev, statutReservation: "TERMINEE" } : null
-        );
-      }
-    } catch (err) {
-      console.error(err);
-      showNotification("Impossible de terminer l'intervention. Veuillez réessayer.", "error");
-    } finally {
-      setActionLoading(null);
-    }
   };
 
   const formatDate = (dateStr) => {
@@ -117,32 +128,6 @@ const InterventionsArtisan = () => {
       });
     } catch {
       return dateStr;
-    }
-  };
-
-  const getStatutLabel = (statut) => {
-    switch (statut) {
-      case "EN_COURS":
-        return "En cours";
-      case "ACCEPTEE":
-        return "Acceptée";
-      case "TERMINEE":
-        return "Terminée";
-      default:
-        return statut;
-    }
-  };
-
-  const getStatutClass = (statut) => {
-    switch (statut) {
-      case "EN_COURS":
-        return "bg-amber-50 text-amber-700 border-amber-200/60";
-      case "ACCEPTEE":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200/60";
-      case "TERMINEE":
-        return "bg-slate-50 text-slate-700 border-slate-200/60";
-      default:
-        return "bg-slate-50 text-slate-700 border-slate-200/60";
     }
   };
 
@@ -178,14 +163,14 @@ const InterventionsArtisan = () => {
         </div>
       )}
 
-      {interventions.length === 0 ? (
+      {demandes.length === 0 ? (
         <div className="bg-white border border-slate-200/80 rounded-3xl p-16 text-center shadow-xs">
           <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
-            <FaTools className="text-2xl text-slate-400" />
+            <FaClipboardList className="text-2xl text-slate-400" />
           </div>
-          <h3 className="text-slate-800 font-semibold text-base mb-1">Aucune intervention</h3>
+          <h3 className="text-slate-800 font-semibold text-base mb-1">Aucune demande</h3>
           <p className="text-slate-400 text-sm">
-            Aucune intervention en cours, acceptée ou terminée pour le moment.
+            Aucune nouvelle demande de réservation pour le moment.
           </p>
         </div>
       ) : (
@@ -194,38 +179,30 @@ const InterventionsArtisan = () => {
             <TableHeader>
               <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
                 <TableHead className="py-4 px-6 text-slate-400 uppercase text-xs font-semibold">Client</TableHead>
-                <TableHead className="py-4 px-6 text-slate-400 uppercase text-xs font-semibold">Date d'intervention</TableHead>
-                <TableHead className="py-4 px-6 text-slate-400 uppercase text-xs font-semibold">Adresse</TableHead>
-                <TableHead className="py-4 px-6 text-slate-400 uppercase text-xs font-semibold">Prix</TableHead>
+                <TableHead className="py-4 px-6 text-slate-400 uppercase text-xs font-semibold">Date prévue</TableHead>
                 <TableHead className="py-4 px-6 text-slate-400 uppercase text-xs font-semibold">Statut</TableHead>
                 <TableHead className="py-4 px-6 text-right text-slate-400 uppercase text-xs font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {interventions.map((intervention) => (
-                <TableRow key={intervention.id} className="hover:bg-slate-50/50">
+              {demandes.map((demande) => (
+                <TableRow key={demande.id} className="hover:bg-slate-50/50">
                   <TableCell className="py-4 px-6 font-semibold text-slate-800">
-                    {intervention.clientPrenom ? `${intervention.clientPrenom} ${intervention.clientNom || ""}` : intervention.clientNom || "Client"}
+                    {demande.clientPrenom ? `${demande.clientPrenom} ${demande.clientNom || ""}` : demande.clientNom || "Client"}
                   </TableCell>
                   <TableCell className="py-4 px-6 text-slate-600 text-xs">
-                    {formatDate(intervention.dateIntervention || intervention.dateReservation)}
-                  </TableCell>
-                  <TableCell className="py-4 px-6 text-slate-600 text-xs max-w-xs truncate">
-                    {intervention.adressIntervention || "Non définie"}
-                  </TableCell>
-                  <TableCell className="py-4 px-6 font-medium text-slate-800">
-                    {intervention.prixTotal ? `${intervention.prixTotal} DH` : "Non défini"}
+                    {formatDate(demande.dateIntervention || demande.dateReservation)}
                   </TableCell>
                   <TableCell className="py-4 px-6">
-                    <span className={`px-3 py-1 border rounded-full text-xs font-semibold tracking-wide inline-block ${getStatutClass(intervention.statutReservation)}`}>
-                      {getStatutLabel(intervention.statutReservation)}
+                    <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200/60 rounded-full text-xs font-semibold tracking-wide inline-block">
+                      En attente
                     </span>
                   </TableCell>
                   <TableCell className="py-4 px-6 text-right">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => openDetails(intervention)}
+                      onClick={() => openDetails(demande)}
                       className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
                     >
                       <FaEye size={12} />
@@ -239,44 +216,20 @@ const InterventionsArtisan = () => {
         </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0}
-          >
-            Précédent
-          </Button>
-          <span className="text-sm text-slate-600">
-            Page {page + 1} / {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-            disabled={page >= totalPages - 1}
-          >
-            Suivant
-          </Button>
-        </div>
-      )}
-
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        {selectedIntervention && (
+        {selectedDemande && (
           <DialogContent className="max-w-lg rounded-3xl p-6">
             <DialogHeader className="pb-4 border-b border-slate-100 mb-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-sm">
-                  #{selectedIntervention.id}
+                  #{selectedDemande.id}
                 </div>
                 <div>
                   <DialogTitle className="text-base font-bold text-slate-900">
-                    Détails de l'intervention
+                    Détails de la demande
                   </DialogTitle>
                   <DialogDescription className="text-xs text-slate-400">
-                    Informations complètes de l'intervention
+                    Informations complètes de la réservation
                   </DialogDescription>
                 </div>
               </div>
@@ -290,7 +243,7 @@ const InterventionsArtisan = () => {
                 <div>
                   <span className="text-xs text-slate-400 block">Nom du Client</span>
                   <strong className="text-slate-800 font-semibold">
-                    {selectedIntervention.clientPrenom ? `${selectedIntervention.clientPrenom} ${selectedIntervention.clientNom || ""}` : selectedIntervention.clientNom || "Client"}
+                    {selectedDemande.clientPrenom ? `${selectedDemande.clientPrenom} ${selectedDemande.clientNom || ""}` : selectedDemande.clientNom || "Client"}
                   </strong>
                 </div>
               </div>
@@ -302,65 +255,64 @@ const InterventionsArtisan = () => {
                 <div>
                   <span className="text-xs text-slate-400 block">Date d'intervention / Réservation</span>
                   <strong className="text-slate-800 font-semibold">
-                    {formatDate(selectedIntervention.dateIntervention || selectedIntervention.dateReservation)}
+                    {formatDate(selectedDemande.dateIntervention || selectedDemande.dateReservation)}
                   </strong>
                 </div>
               </div>
 
-              {selectedIntervention.adressIntervention && (
+              {selectedDemande.adressIntervention && (
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center text-slate-500">
                     <FaMapMarkerAlt size={14} />
                   </div>
                   <div>
                     <span className="text-xs text-slate-400 block">Adresse d'intervention</span>
-                    <strong className="text-slate-800 font-semibold">{selectedIntervention.adressIntervention}</strong>
+                    <strong className="text-slate-800 font-semibold">{selectedDemande.adressIntervention}</strong>
                   </div>
                 </div>
               )}
 
-              {selectedIntervention.descriptionProbleme && (
+              {selectedDemande.descriptionProbleme && (
                 <div className="bg-amber-50/40 p-4 rounded-xl border border-amber-100">
                   <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block mb-1">
                     Problème signalé :
                   </span>
                   <p className="text-sm text-slate-700 leading-relaxed">
-                    {selectedIntervention.descriptionProbleme}
+                    {selectedDemande.descriptionProbleme}
                   </p>
-                </div>
-              )}
-
-              {selectedIntervention.prixTotal && (
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center text-slate-500">
-                    <FaEuroSign size={14} />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 block">Prix total</span>
-                    <strong className="text-slate-800 font-semibold">{selectedIntervention.prixTotal} DH</strong>
-                  </div>
                 </div>
               )}
             </div>
 
             <DialogFooter className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 sm:justify-end">
-              {selectedIntervention.statutReservation === "TERMINEE" ? (
-                <span className="px-4 py-1.5 bg-slate-100 text-slate-800 border border-slate-200 rounded-full text-xs font-bold">
-                  Terminée
+              {selectedDemande.statutReservation === "ACCEPTEE" ? (
+                <span className="px-4 py-1.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold">
+                  Acceptée
                 </span>
-              ) : (selectedIntervention.statutReservation === "ACCEPTEE" || selectedIntervention.statutReservation === "EN_COURS") ? (
-                <Button
-                  onClick={() => handleTerminer(selectedIntervention.id)}
-                  disabled={actionLoading === selectedIntervention.id}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer gap-2"
-                >
-                  <FaCheck size={13} />
-                  {actionLoading === selectedIntervention.id ? "Terminaison..." : "Terminer"}
-                </Button>
+              ) : selectedDemande.statutReservation === "REFUSEE" ? (
+                <span className="px-4 py-1.5 bg-red-100 text-red-800 border border-red-200 rounded-full text-xs font-bold">
+                  Refusée
+                </span>
               ) : (
-                <span className="px-4 py-1.5 bg-slate-100 text-slate-800 border border-slate-200 rounded-full text-xs font-bold">
-                  {getStatutLabel(selectedIntervention.statutReservation)}
-                </span>
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleRefuser(selectedDemande.id)}
+                    disabled={actionLoading === selectedDemande.id}
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer gap-2"
+                  >
+                    <FaTimes size={13} />
+                    {actionLoading === selectedDemande.id ? "Traitement..." : "Refuser"}
+                  </Button>
+                  <Button
+                    onClick={() => handleAccepter(selectedDemande.id)}
+                    disabled={actionLoading === selectedDemande.id}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer gap-2"
+                  >
+                    <FaCheck size={13} />
+                    {actionLoading === selectedDemande.id ? "Traitement..." : "Accepter"}
+                  </Button>
+                </>
               )}
             </DialogFooter>
           </DialogContent>
@@ -370,4 +322,4 @@ const InterventionsArtisan = () => {
   );
 };
 
-export default InterventionsArtisan;
+export default DemandesArtisan;
