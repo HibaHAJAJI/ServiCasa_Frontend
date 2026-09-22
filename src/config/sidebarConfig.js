@@ -6,6 +6,7 @@ import {
   FaUserShield,
   FaFolder,
   FaCalendarAlt,
+  FaStar,
 } from "react-icons/fa";
 
 const sidebarConfig = {
@@ -38,31 +39,36 @@ const sidebarConfig = {
       path: "/artisan/interventions",
       icon: FaTools,
     },
+    {
+      label: "Mes avis",
+      path: "/artisan/avis",
+      icon: FaStar,
+    },
   ],
 
-ADMIN: [
-  {
-    label: "Tableau de bord",
-    path: "/dashboard/admin",
-    icon: FaChartBar,
-  },
-  {
-    label: "Validation des Artisans",
-    path: "/admin/artisans/validation",
-    icon: FaUserShield,
-  },
-  {
-    label: "Gestion des Catégories",
-    path: "/admin/categories",
-    icon: FaFolder,
-  },
-  {
-    label: "Réservations",
-    path: "/admin/reservations",
-    icon: FaClipboardList,
-  },
+  ADMIN: [
+    {
+      label: "Tableau de bord",
+      path: "/dashboard/admin",
+      icon: FaChartBar,
+    },
+    {
+      label: "Validation des Artisans",
+      path: "/admin/artisans/validation",
+      icon: FaUserShield,
+    },
+    {
+      label: "Gestion des Catégories",
+      path: "/admin/categories",
+      icon: FaFolder,
+    },
+    {
+      label: "Réservations",
+      path: "/admin/reservations",
+      icon: FaClipboardList,
+    },
 
-],
+  ],
 };
 
-export default sidebarConfig;
+export default sidebarConfig;

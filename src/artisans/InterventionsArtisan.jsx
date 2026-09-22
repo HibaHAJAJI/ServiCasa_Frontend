@@ -8,6 +8,7 @@ import {
   FaCalendarAlt,
   FaMapMarkerAlt,
   FaEuroSign,
+  FaCheck,
 } from "react-icons/fa";
 
 import reservationService from "../services/reservationService";
@@ -42,6 +43,7 @@ const InterventionsArtisan = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [notification, setNotification] = useState(null);
+  const [actionLoading, setActionLoading] = useState(null);
 
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
@@ -76,6 +78,33 @@ const InterventionsArtisan = () => {
   const closeDetails = () => {
     setSelectedIntervention(null);
     setIsModalOpen(false);
+  };
+
+  const handleTerminer = async (id) => {
+    if (actionLoading) return;
+    try {
+      setActionLoading(id);
+      await reservationService.terminerReservation(id);
+
+      showNotification("Intervention terminée avec succès.", "success");
+
+      setInterventions((prev) =>
+        prev.map((i) =>
+          i.id === id ? { ...i, statutReservation: "TERMINEE" } : i
+        )
+      );
+
+      if (selectedIntervention?.id === id) {
+        setSelectedIntervention((prev) =>
+          prev ? { ...prev, statutReservation: "TERMINEE" } : null
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      showNotification("Impossible de terminer l'intervention. Veuillez réessayer.", "error");
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const formatDate = (dateStr) => {
@@ -321,14 +350,15 @@ const InterventionsArtisan = () => {
                 <span className="px-4 py-1.5 bg-slate-100 text-slate-800 border border-slate-200 rounded-full text-xs font-bold">
                   Terminée
                 </span>
-              ) : selectedIntervention.statutReservation === "ACCEPTEE" ? (
-                <span className="px-4 py-1.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold">
-                  Acceptée
-                </span>
-              ) : selectedIntervention.statutReservation === "EN_COURS" ? (
-                <span className="px-4 py-1.5 bg-amber-100 text-amber-800 border border-amber-200 rounded-full text-xs font-bold">
-                  En cours
-                </span>
+              ) : (selectedIntervention.statutReservation === "ACCEPTEE" || selectedIntervention.statutReservation === "EN_COURS") ? (
+                <Button
+                  onClick={() => handleTerminer(selectedIntervention.id)}
+                  disabled={actionLoading === selectedIntervention.id}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer gap-2"
+                >
+                  <FaCheck size={13} />
+                  {actionLoading === selectedIntervention.id ? "Terminaison..." : "Terminer"}
+                </Button>
               ) : (
                 <span className="px-4 py-1.5 bg-slate-100 text-slate-800 border border-slate-200 rounded-full text-xs font-bold">
                   {getStatutLabel(selectedIntervention.statutReservation)}

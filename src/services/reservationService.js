@@ -41,6 +41,11 @@ const reservationService = {
     return response.data;
   },
 
+  terminerReservation: async (id) => {
+    const response = await api.patch(`/reservations/${id}/terminer`);
+    return response.data;
+  },
+
   cancelReservation: async (id) => {
     await api.delete(`/reservations/${id}/annuler`);
   },

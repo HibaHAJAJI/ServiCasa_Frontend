@@ -11,6 +11,7 @@ import DashboardClient from '@/pages/dashboard/DashboardClient';
 
 import DemandesArtisan from '@/artisans/DemandesArtisan';
 import InterventionsArtisan from '@/artisans/InterventionsArtisan';
+import AvisArtisan from '@/artisans/AvisArtisan';
 import Profile from '@/pages/profile/Profile';
 import MesReservations from '@/pages/client/MesReservations';
 import NotFound from "../components/notFound/NotFound";
@@ -39,6 +40,7 @@ const AppRoutes = () => {
           <Route path="/dashboard/artisan" element={<Dashboard />} />
           <Route path="/artisan/demandes" element={<DemandesArtisan />} />
           <Route path="/artisan/interventions" element={<InterventionsArtisan />} />
+          <Route path="/artisan/avis" element={<AvisArtisan />} />
           <Route path="/profile" element={<Profile />} />
 
           <Route path="/dashboard/admin" element={<DashboardAdmin />} />
