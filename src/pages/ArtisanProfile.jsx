@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Briefcase, Calendar, MapPin } from "lucide-react";
+import {
+  Banknote,
+  Briefcase,
+  Calendar,
+  Clock,
+  MapPin,
+  Phone,
+  Star,
+} from "lucide-react";
 
 import artisanService from "@/services/artisanService";
 import reservationService from "@/services/reservationService";
+import avisService from "@/services/avisService";
 import { useAuth } from "@/context/auth/AuthContext";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +34,9 @@ const ArtisanProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [moyenneAvis, setMoyenneAvis] = useState(0);
+  const [nombreAvis, setNombreAvis] = useState(0);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dateIntervention, setDateIntervention] = useState("");
   const [adressIntervention, setAdressIntervention] = useState("");
@@ -34,6 +46,16 @@ const ArtisanProfile = () => {
   const [submitError, setSubmitError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  const hasValue = (value) => {
+    return (
+      value !== undefined &&
+      value !== null &&
+      String(value).trim() !== ""
+    );
+  };
+
+  const hasReviews = Number(nombreAvis) > 0;
+
   useEffect(() => {
     const fetchArtisan = async () => {
       try {
@@ -41,7 +63,26 @@ const ArtisanProfile = () => {
         setError("");
 
         const data = await artisanService.getById(id);
+
         setArtisan(data);
+
+        if (
+          data.moyenneAvis === undefined ||
+          data.moyenneAvis === null ||
+          data.nombreAvis === undefined ||
+          data.nombreAvis === null
+        ) {
+          const [moyenne, count] = await Promise.all([
+            avisService.getMoyenneArtisan(data.id),
+            avisService.getNombreAvisArtisan(data.id),
+          ]);
+
+          setMoyenneAvis(Number(moyenne) || 0);
+          setNombreAvis(Number(count) || 0);
+        } else {
+          setMoyenneAvis(Number(data.moyenneAvis) || 0);
+          setNombreAvis(Number(data.nombreAvis) || 0);
+        }
       } catch (error) {
         console.error(error);
         setError("Impossible de charger le profil de l'artisan.");
@@ -136,9 +177,7 @@ const ArtisanProfile = () => {
     <div className="max-w-4xl mx-auto p-4 md:p-6">
       <Card className="border-slate-200 shadow-sm">
         <CardContent className="p-6 md:p-8">
-
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 pb-6 border-b border-slate-100">
-
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-[#0B1F3A] text-white flex items-center justify-center font-bold text-xl">
                 {artisan.prenom?.charAt(0)}
@@ -151,12 +190,14 @@ const ArtisanProfile = () => {
                 </h1>
 
                 <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-slate-500">
-                  <span className="flex items-center gap-1">
-                    <Briefcase size={15} />
-                    {artisan.specialite || "Spécialité non renseignée"}
-                  </span>
+                  {hasValue(artisan.specialite) && (
+                    <span className="flex items-center gap-1">
+                      <Briefcase size={15} />
+                      {artisan.specialite}
+                    </span>
+                  )}
 
-                  {artisan.ville && (
+                  {hasValue(artisan.ville) && (
                     <>
                       <span>•</span>
 
@@ -179,44 +220,165 @@ const ArtisanProfile = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs text-slate-400 uppercase font-semibold">
-                Spécialité
-              </p>
-
-              <p className="mt-1 font-semibold text-[#0B1F3A]">
-                {artisan.specialite || "Non renseignée"}
-              </p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs text-slate-400 uppercase font-semibold">
-                Tarif horaire
-              </p>
-
-              <p className="mt-1 font-semibold text-[#0B1F3A]">
-                {artisan.tarifHoraire != null
-                  ? `${artisan.tarifHoraire} DH/h`
-                  : "Non renseigné"}
-              </p>
-            </div>
-
-          </div>
-
-          {artisan.ville && (
-            <div className="mt-6">
-              <h2 className="font-semibold text-[#0B1F3A] mb-2">
-                Ville
+          {(hasValue(artisan.specialite) ||
+            hasValue(artisan.tarifHoraire) ||
+            hasValue(artisan.anneesExperience) ||
+            hasValue(artisan.zoneIntervention)) && (
+            <section className="mt-6">
+              <h2 className="font-semibold text-[#0B1F3A] mb-3">
+                Informations professionnelles
               </h2>
 
-              <p className="text-sm text-slate-600">
-                {artisan.ville}
-              </p>
-            </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {hasValue(artisan.specialite) && (
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 uppercase font-semibold">
+                      <Briefcase size={15} />
+                      Spécialité
+                    </div>
+
+                    <p className="mt-1 font-semibold text-[#0B1F3A]">
+                      {artisan.specialite}
+                    </p>
+                  </div>
+                )}
+
+                {hasValue(artisan.tarifHoraire) && (
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 uppercase font-semibold">
+                      <Banknote size={15} />
+                      Tarif horaire
+                    </div>
+
+                    <p className="mt-1 font-semibold text-[#0B1F3A]">
+                      {artisan.tarifHoraire} DH/h
+                    </p>
+                  </div>
+                )}
+
+                {hasValue(artisan.anneesExperience) && (
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 uppercase font-semibold">
+                      <Clock size={15} />
+                      Expérience
+                    </div>
+
+                    <p className="mt-1 font-semibold text-[#0B1F3A]">
+                      {artisan.anneesExperience}{" "}
+                      {Number(artisan.anneesExperience) === 1
+                        ? "an"
+                        : "ans"}
+                    </p>
+                  </div>
+                )}
+
+                {hasValue(artisan.zoneIntervention) && (
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 uppercase font-semibold">
+                      <MapPin size={15} />
+                      Zone d'intervention
+                    </div>
+
+                    <p className="mt-1 font-semibold text-[#0B1F3A]">
+                      {artisan.zoneIntervention}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
           )}
 
+          {(hasValue(artisan.ville) ||
+            hasValue(artisan.telephone)) && (
+            <section className="mt-6">
+              <h2 className="font-semibold text-[#0B1F3A] mb-3">
+                Informations de contact
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {hasValue(artisan.ville) && (
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 uppercase font-semibold">
+                      <MapPin size={15} />
+                      Ville
+                    </div>
+
+                    <p className="mt-1 font-semibold text-[#0B1F3A]">
+                      {artisan.ville}
+                    </p>
+                  </div>
+                )}
+
+                {hasValue(artisan.telephone) && (
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 uppercase font-semibold">
+                      <Phone size={15} />
+                      Téléphone
+                    </div>
+
+                    <p className="mt-1 font-semibold text-[#0B1F3A]">
+                      {artisan.telephone}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {hasValue(artisan.description) && (
+            <section className="mt-6">
+              <h2 className="font-semibold text-[#0B1F3A] mb-2">
+                Présentation
+              </h2>
+
+              <p className="text-sm leading-6 text-slate-600">
+                {artisan.description}
+              </p>
+            </section>
+          )}
+
+          <section className="mt-6">
+            <h2 className="font-semibold text-[#0B1F3A] mb-3">
+              Avis clients
+            </h2>
+
+            {hasReviews ? (
+              <div className="flex items-center gap-3">
+                <div className="flex gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      size={20}
+                      className={
+                        star <= Math.round(moyenneAvis)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-slate-300"
+                      }
+                    />
+                  ))}
+                </div>
+
+                <div className="flex flex-col">
+                  <span className="font-semibold text-[#0B1F3A] text-lg">
+                    {Number(moyenneAvis).toFixed(1)}
+                  </span>
+
+                  <span className="text-sm text-slate-500">
+                    {Number(nombreAvis)}{" "}
+                    {Number(nombreAvis) === 1 ? "avis" : "avis"}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Star
+                  size={18}
+                  className="text-yellow-400"
+                />
+                <span>Aucun avis</span>
+              </div>
+            )}
+          </section>
         </CardContent>
       </Card>
 

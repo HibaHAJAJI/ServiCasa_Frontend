@@ -18,7 +18,6 @@ class NotificationSocketService {
     const socketUrl = "http://localhost:8081/ws";
 
     this.stompClient = new Client({
-      brokerURL: "ws://localhost:8081/ws/websocket",
       webSocketFactory: () => new SockJS(socketUrl),
       connectHeaders: {
         Authorization: `Bearer ${token}`,

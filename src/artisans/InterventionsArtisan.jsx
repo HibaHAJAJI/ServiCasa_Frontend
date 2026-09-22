@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import {
-  FaClipboardList,
   FaEye,
   FaTools,
-  FaCheckCircle,
   FaUser,
   FaCalendarAlt,
   FaMapMarkerAlt,
