@@ -7,6 +7,8 @@ import {
   FaFolder,
   FaCalendarAlt,
   FaStar,
+  FaClock,
+  FaWrench,
 } from "react-icons/fa";
 
 const sidebarConfig = {
@@ -38,6 +40,16 @@ const sidebarConfig = {
       label: "Interventions",
       path: "/artisan/interventions",
       icon: FaTools,
+    },
+    {
+      label: "Disponibilités",
+      path: "/artisan/disponibilites",
+      icon: FaClock,
+    },
+    {
+      label: "Mes services",
+      path: "/artisan/services",
+      icon: FaWrench,
     },
     {
       label: "Mes avis",

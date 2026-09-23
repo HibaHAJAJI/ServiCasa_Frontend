@@ -30,12 +30,13 @@ const DashboardArtisan = () => {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const artisanId = 1;
+        const data = await artisanDashboardService.getDashboard();
 
-        const data =
-          await artisanDashboardService.getDashboard(artisanId);
-
-        setDashboard(data);
+        setDashboard({
+          nouvellesDemandes: data?.nouvellesDemandes ?? 0,
+          interventionsEnCours: data?.interventionsEnCours ?? 0,
+          interventionsTerminees: data?.interventionsTerminees ?? 0,
+        });
       } catch (error) {
         console.error("Erreur dashboard :", error);
       }
@@ -47,10 +48,13 @@ const DashboardArtisan = () => {
   useEffect(() => {
     const loadDemandes = async () => {
       try {
-        const data =
-          await reservationService.getPendingReservations();
+        const data = await reservationService.getPendingReservations();
 
-        setDemandes(data?.content || []);
+        const reservations = Array.isArray(data)
+          ? data
+          : data?.content || data?.data || [];
+
+        setDemandes(reservations.slice(0, 3));
       } catch (error) {
         console.error("Erreur chargement demandes :", error);
         setDemandes([]);
@@ -173,14 +177,15 @@ const DashboardArtisan = () => {
                   </thead>
 
                   <tbody>
-                    {demandes.slice(0, 3).map((demande) => (
+                    {demandes.map((demande) => (
                       <tr
                         key={demande.id}
                         className="border-b border-gray-50 last:border-0"
                       >
                         <td className="px-4 py-4">
                           <p className="font-medium text-[#0B1F3A]">
-                            {demande.clientPrenom} {demande.clientNom}
+                            {demande.clientPrenom || ""}{" "}
+                            {demande.clientNom || ""}
                           </p>
                         </td>
 
@@ -196,7 +201,11 @@ const DashboardArtisan = () => {
                             ? new Date(
                                 demande.dateIntervention
                               ).toLocaleDateString("fr-FR")
-                            : "Date non définie"}
+                            : demande.dateReservation
+                              ? new Date(
+                                  demande.dateReservation
+                                ).toLocaleDateString("fr-FR")
+                              : "Date non définie"}
                         </td>
 
                         <td className="px-4 py-4">

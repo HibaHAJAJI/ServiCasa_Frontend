@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
   FaClipboardList,
   FaEye,
@@ -12,6 +13,7 @@ import {
 import reservationService from "../../services/reservationService";
 
 import { Button } from "@/components/ui/button";
+
 import {
   Table,
   TableBody,
@@ -20,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import {
   Dialog,
   DialogContent,
@@ -42,44 +45,90 @@ const DemandesArtisan = () => {
 
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
+
     setTimeout(() => {
       setNotification(null);
     }, 4000);
   };
 
-  const fetchDemandes = async () => {
-    try {
-      setLoading(true);
-      const data = await reservationService.getPendingReservations();
-      setDemandes(Array.isArray(data) ? data : data.content || []);
-    } catch (err) {
-      console.error(err);
-      setError("Impossible de charger les demandes.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchDemandes();
+    let cancelled = false;
+
+    const loadDemandes = async () => {
+      try {
+        setLoading(true);
+
+        const data = await reservationService.getPendingReservations();
+
+        if (cancelled) return;
+
+        setDemandes(
+          Array.isArray(data)
+            ? data
+            : data?.content || []
+        );
+
+        setError("");
+      } catch (err) {
+        if (cancelled) return;
+
+        console.error(err);
+        setError("Impossible de charger les demandes.");
+        setDemandes([]);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadDemandes();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleAccepter = async (id) => {
     if (actionLoading) return;
+
+    const demandeToRemove = demandes.find(d => d.id === id);
+
     try {
       setActionLoading(id);
+
       await reservationService.accepterReservation(id);
 
-      showNotification("Demande acceptée avec succès.", "success");
+      showNotification(
+        "Demande acceptée avec succès.",
+        "success"
+      );
 
-      setDemandes((prev) => prev.filter((d) => d.id !== id));
+      setDemandes((prev) =>
+        prev.filter((d) => d.id !== id)
+      );
 
       if (selectedDemande?.id === id) {
-        setSelectedDemande((prev) => prev ? { ...prev, statutReservation: "ACCEPTEE" } : null);
+        setSelectedDemande((prev) =>
+          prev
+            ? {
+                ...prev,
+                statutReservation: "ACCEPTEE",
+              }
+            : null
+        );
       }
     } catch (err) {
       console.error(err);
-      showNotification("Impossible de modifier la réservation. Veuillez réessayer.", "error");
+
+      showNotification(
+        err?.response?.data?.message ||
+          "Impossible de modifier la réservation. Veuillez réessayer.",
+        "error"
+      );
+      if (demandeToRemove) {
+        setDemandes(prev => [demandeToRemove, ...prev.filter(d => d.id !== id)]);
+      }
     } finally {
       setActionLoading(null);
     }
@@ -87,20 +136,44 @@ const DemandesArtisan = () => {
 
   const handleRefuser = async (id) => {
     if (actionLoading) return;
+
+    const demandeToRemove = demandes.find(d => d.id === id);
+
     try {
       setActionLoading(id);
-        await reservationService.refuserReservation(id);
 
-      showNotification("Demande refusée.", "info");
+      await reservationService.refuserReservation(id);
 
-      setDemandes((prev) => prev.filter((d) => d.id !== id));
+      showNotification(
+        "Demande refusée.",
+        "info"
+      );
+
+      setDemandes((prev) =>
+        prev.filter((d) => d.id !== id)
+      );
 
       if (selectedDemande?.id === id) {
-        setSelectedDemande((prev) => prev ? { ...prev, statutReservation: "REFUSEE" } : null);
+        setSelectedDemande((prev) =>
+          prev
+            ? {
+                ...prev,
+                statutReservation: "REFUSEE",
+              }
+            : null
+        );
       }
     } catch (err) {
       console.error(err);
-      showNotification("Impossible de modifier la réservation. Veuillez réessayer.", "error");
+
+      showNotification(
+        err?.response?.data?.message ||
+          "Impossible de modifier la réservation. Veuillez réessayer.",
+        "error"
+      );
+      if (demandeToRemove) {
+        setDemandes(prev => [demandeToRemove, ...prev.filter(d => d.id !== id)]);
+      }
     } finally {
       setActionLoading(null);
     }
@@ -111,13 +184,9 @@ const DemandesArtisan = () => {
     setIsModalOpen(true);
   };
 
-  const closeDetails = () => {
-    setSelectedDemande(null);
-    setIsModalOpen(false);
-  };
-
   const formatDate = (dateStr) => {
     if (!dateStr) return "Non disponible";
+
     try {
       return new Date(dateStr).toLocaleString("fr-FR", {
         day: "numeric",
@@ -133,30 +202,30 @@ const DemandesArtisan = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-[#0B1F3A] rounded-full animate-spin" />
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#0B1F3A]" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-8 text-center bg-red-50 border border-red-200 rounded-2xl max-w-lg mx-auto mt-10 text-red-600 font-medium">
+      <div className="mx-auto mt-10 max-w-lg rounded-2xl border border-red-200 bg-red-50 p-8 text-center font-medium text-red-600">
         {error}
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 md:p-8 space-y-4">
+    <div className="mx-auto max-w-6xl space-y-4 p-6 md:p-8">
       {notification && (
         <div
-          className={`p-4 rounded-xl text-sm font-medium transition-all shadow-sm border ${
+          className={`rounded-xl border p-4 text-sm font-medium shadow-sm ${
             notification.type === "success"
-              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
               : notification.type === "info"
-              ? "bg-slate-100 text-slate-800 border-slate-300"
-              : "bg-red-50 text-red-800 border-red-200"
+                ? "border-slate-300 bg-slate-100 text-slate-800"
+                : "border-red-200 bg-red-50 text-red-800"
           }`}
         >
           {notification.message}
@@ -164,46 +233,75 @@ const DemandesArtisan = () => {
       )}
 
       {demandes.length === 0 ? (
-        <div className="bg-white border border-slate-200/80 rounded-3xl p-16 text-center shadow-xs">
-          <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-16 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-100 bg-slate-50">
             <FaClipboardList className="text-2xl text-slate-400" />
           </div>
-          <h3 className="text-slate-800 font-semibold text-base mb-1">Aucune demande</h3>
-          <p className="text-slate-400 text-sm">
+
+          <h3 className="mb-1 text-base font-semibold text-slate-800">
+            Aucune demande
+          </h3>
+
+          <p className="text-sm text-slate-400">
             Aucune nouvelle demande de réservation pour le moment.
           </p>
         </div>
       ) : (
-        <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
           <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
-                <TableHead className="py-4 px-6 text-slate-400 uppercase text-xs font-semibold">Client</TableHead>
-                <TableHead className="py-4 px-6 text-slate-400 uppercase text-xs font-semibold">Date prévue</TableHead>
-                <TableHead className="py-4 px-6 text-slate-400 uppercase text-xs font-semibold">Statut</TableHead>
-                <TableHead className="py-4 px-6 text-right text-slate-400 uppercase text-xs font-semibold">Actions</TableHead>
+              <TableRow className="bg-slate-50/70">
+                <TableHead className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
+                  Client
+                </TableHead>
+
+                <TableHead className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
+                  Date prévue
+                </TableHead>
+
+                <TableHead className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
+                  Statut
+                </TableHead>
+
+                <TableHead className="px-6 py-4 text-right text-xs font-semibold uppercase text-slate-400">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {demandes.map((demande) => (
-                <TableRow key={demande.id} className="hover:bg-slate-50/50">
-                  <TableCell className="py-4 px-6 font-semibold text-slate-800">
-                    {demande.clientPrenom ? `${demande.clientPrenom} ${demande.clientNom || ""}` : demande.clientNom || "Client"}
+                <TableRow
+                  key={demande.id}
+                  className="hover:bg-slate-50/50"
+                >
+                  <TableCell className="px-6 py-4 font-semibold text-slate-800">
+                    {demande.clientPrenom
+                      ? `${demande.clientPrenom} ${
+                          demande.clientNom || ""
+                        }`
+                      : demande.clientNom || "Client"}
                   </TableCell>
-                  <TableCell className="py-4 px-6 text-slate-600 text-xs">
-                    {formatDate(demande.dateIntervention || demande.dateReservation)}
+
+                  <TableCell className="px-6 py-4 text-xs text-slate-600">
+                    {formatDate(
+                      demande.dateIntervention ||
+                        demande.dateReservation
+                    )}
                   </TableCell>
-                  <TableCell className="py-4 px-6">
-                    <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200/60 rounded-full text-xs font-semibold tracking-wide inline-block">
+
+                  <TableCell className="px-6 py-4">
+                    <span className="inline-block rounded-full border border-amber-200/60 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
                       En attente
                     </span>
                   </TableCell>
-                  <TableCell className="py-4 px-6 text-right">
+
+                  <TableCell className="px-6 py-4 text-right">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => openDetails(demande)}
-                      className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
+                      className="h-8 cursor-pointer gap-1.5 text-xs font-medium"
                     >
                       <FaEye size={12} />
                       Détails
@@ -216,18 +314,29 @@ const DemandesArtisan = () => {
         </div>
       )}
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+
+          if (!open) {
+            setSelectedDemande(null);
+          }
+        }}
+      >
         {selectedDemande && (
           <DialogContent className="max-w-lg rounded-3xl p-6">
-            <DialogHeader className="pb-4 border-b border-slate-100 mb-2">
+            <DialogHeader className="mb-2 border-b border-slate-100 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-sm">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-sm font-bold text-slate-700">
                   #{selectedDemande.id}
                 </div>
+
                 <div>
                   <DialogTitle className="text-base font-bold text-slate-900">
                     Détails de la demande
                   </DialogTitle>
+
                   <DialogDescription className="text-xs text-slate-400">
                     Informations complètes de la réservation
                   </DialogDescription>
@@ -235,82 +344,119 @@ const DemandesArtisan = () => {
               </div>
             </DialogHeader>
 
-            <div className="space-y-4 my-2">
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center text-slate-500">
+            <div className="my-2 space-y-4">
+              <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-500 shadow-sm">
                   <FaUser size={14} />
                 </div>
+
                 <div>
-                  <span className="text-xs text-slate-400 block">Nom du Client</span>
-                  <strong className="text-slate-800 font-semibold">
-                    {selectedDemande.clientPrenom ? `${selectedDemande.clientPrenom} ${selectedDemande.clientNom || ""}` : selectedDemande.clientNom || "Client"}
+                  <span className="block text-xs text-slate-400">
+                    Nom du Client
+                  </span>
+
+                  <strong className="font-semibold text-slate-800">
+                    {selectedDemande.clientPrenom
+                      ? `${selectedDemande.clientPrenom} ${
+                          selectedDemande.clientNom || ""
+                        }`
+                      : selectedDemande.clientNom || "Client"}
                   </strong>
                 </div>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center text-slate-500">
+              <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-500 shadow-sm">
                   <FaCalendarAlt size={14} />
                 </div>
+
                 <div>
-                  <span className="text-xs text-slate-400 block">Date d'intervention / Réservation</span>
-                  <strong className="text-slate-800 font-semibold">
-                    {formatDate(selectedDemande.dateIntervention || selectedDemande.dateReservation)}
+                  <span className="block text-xs text-slate-400">
+                    Date d'intervention / Réservation
+                  </span>
+
+                  <strong className="font-semibold text-slate-800">
+                    {formatDate(
+                      selectedDemande.dateIntervention ||
+                        selectedDemande.dateReservation
+                    )}
                   </strong>
                 </div>
               </div>
 
               {selectedDemande.adressIntervention && (
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center text-slate-500">
+                <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-500 shadow-sm">
                     <FaMapMarkerAlt size={14} />
                   </div>
+
                   <div>
-                    <span className="text-xs text-slate-400 block">Adresse d'intervention</span>
-                    <strong className="text-slate-800 font-semibold">{selectedDemande.adressIntervention}</strong>
+                    <span className="block text-xs text-slate-400">
+                      Adresse d'intervention
+                    </span>
+
+                    <strong className="font-semibold text-slate-800">
+                      {selectedDemande.adressIntervention}
+                    </strong>
                   </div>
                 </div>
               )}
 
               {selectedDemande.descriptionProbleme && (
-                <div className="bg-amber-50/40 p-4 rounded-xl border border-amber-100">
-                  <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block mb-1">
+                <div className="rounded-xl border border-amber-100 bg-amber-50/40 p-4">
+                  <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-amber-800">
                     Problème signalé :
                   </span>
-                  <p className="text-sm text-slate-700 leading-relaxed">
+
+                  <p className="text-sm leading-relaxed text-slate-700">
                     {selectedDemande.descriptionProbleme}
                   </p>
                 </div>
               )}
             </div>
 
-            <DialogFooter className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 sm:justify-end">
+            <DialogFooter className="flex items-center justify-end gap-3 border-t border-slate-100 pt-3">
               {selectedDemande.statutReservation === "ACCEPTEE" ? (
-                <span className="px-4 py-1.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold">
+                <span className="rounded-full border border-emerald-200 bg-emerald-100 px-4 py-1.5 text-xs font-bold text-emerald-800">
                   Acceptée
                 </span>
               ) : selectedDemande.statutReservation === "REFUSEE" ? (
-                <span className="px-4 py-1.5 bg-red-100 text-red-800 border border-red-200 rounded-full text-xs font-bold">
+                <span className="rounded-full border border-red-200 bg-red-100 px-4 py-1.5 text-xs font-bold text-red-800">
                   Refusée
                 </span>
               ) : (
                 <>
                   <Button
                     variant="outline"
-                    onClick={() => handleRefuser(selectedDemande.id)}
-                    disabled={actionLoading === selectedDemande.id}
-                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer gap-2"
+                    onClick={() =>
+                      handleRefuser(selectedDemande.id)
+                    }
+                    disabled={
+                      actionLoading === selectedDemande.id
+                    }
+                    className="cursor-pointer gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
                   >
                     <FaTimes size={13} />
-                    {actionLoading === selectedDemande.id ? "Traitement..." : "Refuser"}
+
+                    {actionLoading === selectedDemande.id
+                      ? "Traitement..."
+                      : "Refuser"}
                   </Button>
+
                   <Button
-                    onClick={() => handleAccepter(selectedDemande.id)}
-                    disabled={actionLoading === selectedDemande.id}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer gap-2"
+                    onClick={() =>
+                      handleAccepter(selectedDemande.id)
+                    }
+                    disabled={
+                      actionLoading === selectedDemande.id
+                    }
+                    className="cursor-pointer gap-2 bg-emerald-600 text-white hover:bg-emerald-700"
                   >
                     <FaCheck size={13} />
-                    {actionLoading === selectedDemande.id ? "Traitement..." : "Accepter"}
+
+                    {actionLoading === selectedDemande.id
+                      ? "Traitement..."
+                      : "Accepter"}
                   </Button>
                 </>
               )}
