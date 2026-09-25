@@ -1,13 +1,23 @@
 import { CheckCircle2, Clock3, XCircle } from "lucide-react";
 
-const jours = {
-  MONDAY: "Lundi",
-  TUESDAY: "Mardi",
-  WEDNESDAY: "Mercredi",
-  THURSDAY: "Jeudi",
-  FRIDAY: "Vendredi",
-  SATURDAY: "Samedi",
-  SUNDAY: "Dimanche",
+const formatDate = (d) => {
+  if (!d) return "";
+  if (typeof d === "string") {
+    if (d.length === 10) {
+      const [y, m, day] = d.split("-");
+      return `${day}/${m}/${y}`;
+    }
+    return d;
+  }
+  if (d instanceof Date) return d.toLocaleDateString("fr-FR");
+  return String(d);
+};
+
+const formatTime = (t) => {
+  if (!t) return "";
+  if (typeof t === "string") return t.length === 5 ? t : t.slice(0, 5);
+  if (t instanceof Date) return t.toTimeString().slice(0, 5);
+  return String(t);
 };
 
 const DisponibiliteDetails = ({ disponibilite }) => {
@@ -21,16 +31,16 @@ const DisponibiliteDetails = ({ disponibilite }) => {
 
       <div>
         <p className="font-semibold text-[#0B1F3A]">
-          {jours[disponibilite.jour] || disponibilite.jour}
+          {formatDate(disponibilite.date)}
         </p>
 
         {disponible ? (
           <p className="mt-1 text-sm text-slate-500">
-            {disponibilite.heureDebut} - {disponibilite.heureFin}
+            {formatTime(disponibilite.heureDebut)} - {formatTime(disponibilite.heureFin)}
           </p>
         ) : (
           <p className="mt-1 text-sm text-slate-500">
-            Jour de repos
+            Repos
           </p>
         )}
       </div>

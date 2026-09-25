@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  FaEye,
-  FaTools,
-  FaUser,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaEuroSign,
-  FaCheck,
-} from "react-icons/fa";
+import { FaEye, FaTools } from "react-icons/fa";
 
-import reservationService from "../../services/reservationService";
+import reservationService from "../../../services/reservationService";
+import InterventionDetailsModal from "../Intervention/InterventionDetailsModal"; 
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,14 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
 
 const InterventionsArtisan = () => {
   const [interventions, setInterventions] = useState([]);
@@ -54,7 +39,8 @@ const InterventionsArtisan = () => {
     try {
       setLoading(true);
       const data = await reservationService.getInterventions(page, size);
-      setInterventions(Array.isArray(data) ? data : data.content || []);
+      const list = Array.isArray(data) ? data : data.content || [];
+      setInterventions(list);
       setTotalPages(data.totalPages || 0);
     } catch (err) {
       console.error(err);
@@ -73,11 +59,6 @@ const InterventionsArtisan = () => {
     setIsModalOpen(true);
   };
 
-  const closeDetails = () => {
-    setSelectedIntervention(null);
-    setIsModalOpen(false);
-  };
-
   const handleTerminer = async (id) => {
     if (actionLoading) return;
     try {
@@ -87,15 +68,11 @@ const InterventionsArtisan = () => {
       showNotification("Intervention terminée avec succès.", "success");
 
       setInterventions((prev) =>
-        prev.map((i) =>
-          i.id === id ? { ...i, statutReservation: "TERMINEE" } : i
-        )
+        prev.map((i) => (i.id === id ? { ...i, statutReservation: "TERMINEE" } : i))
       );
 
       if (selectedIntervention?.id === id) {
-        setSelectedIntervention((prev) =>
-          prev ? { ...prev, statutReservation: "TERMINEE" } : null
-        );
+        setSelectedIntervention((prev) => (prev ? { ...prev, statutReservation: "TERMINEE" } : null));
       }
     } catch (err) {
       console.error(err);
@@ -205,7 +182,9 @@ const InterventionsArtisan = () => {
               {interventions.map((intervention) => (
                 <TableRow key={intervention.id} className="hover:bg-slate-50/50">
                   <TableCell className="py-4 px-6 font-semibold text-slate-800">
-                    {intervention.clientPrenom ? `${intervention.clientPrenom} ${intervention.clientNom || ""}` : intervention.clientNom || "Client"}
+                    {intervention.clientPrenom
+                      ? `${intervention.clientPrenom} ${intervention.clientNom || ""}`
+                      : intervention.clientNom || "Client"}
                   </TableCell>
                   <TableCell className="py-4 px-6 text-slate-600 text-xs">
                     {formatDate(intervention.dateIntervention || intervention.dateReservation)}
@@ -217,7 +196,11 @@ const InterventionsArtisan = () => {
                     {intervention.prixTotal ? `${intervention.prixTotal} DH` : "Non défini"}
                   </TableCell>
                   <TableCell className="py-4 px-6">
-                    <span className={`px-3 py-1 border rounded-full text-xs font-semibold tracking-wide inline-block ${getStatutClass(intervention.statutReservation)}`}>
+                    <span
+                      className={`px-3 py-1 border rounded-full text-xs font-semibold tracking-wide inline-block ${getStatutClass(
+                        intervention.statutReservation
+                      )}`}
+                    >
                       {getStatutLabel(intervention.statutReservation)}
                     </span>
                   </TableCell>
@@ -263,109 +246,13 @@ const InterventionsArtisan = () => {
         </div>
       )}
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        {selectedIntervention && (
-          <DialogContent className="max-w-lg rounded-3xl p-6">
-            <DialogHeader className="pb-4 border-b border-slate-100 mb-2">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-sm">
-                  #{selectedIntervention.id}
-                </div>
-                <div>
-                  <DialogTitle className="text-base font-bold text-slate-900">
-                    Détails de l'intervention
-                  </DialogTitle>
-                  <DialogDescription className="text-xs text-slate-400">
-                    Informations complètes de l'intervention
-                  </DialogDescription>
-                </div>
-              </div>
-            </DialogHeader>
-
-            <div className="space-y-4 my-2">
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center text-slate-500">
-                  <FaUser size={14} />
-                </div>
-                <div>
-                  <span className="text-xs text-slate-400 block">Nom du Client</span>
-                  <strong className="text-slate-800 font-semibold">
-                    {selectedIntervention.clientPrenom ? `${selectedIntervention.clientPrenom} ${selectedIntervention.clientNom || ""}` : selectedIntervention.clientNom || "Client"}
-                  </strong>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center text-slate-500">
-                  <FaCalendarAlt size={14} />
-                </div>
-                <div>
-                  <span className="text-xs text-slate-400 block">Date d'intervention / Réservation</span>
-                  <strong className="text-slate-800 font-semibold">
-                    {formatDate(selectedIntervention.dateIntervention || selectedIntervention.dateReservation)}
-                  </strong>
-                </div>
-              </div>
-
-              {selectedIntervention.adressIntervention && (
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center text-slate-500">
-                    <FaMapMarkerAlt size={14} />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 block">Adresse d'intervention</span>
-                    <strong className="text-slate-800 font-semibold">{selectedIntervention.adressIntervention}</strong>
-                  </div>
-                </div>
-              )}
-
-              {selectedIntervention.descriptionProbleme && (
-                <div className="bg-amber-50/40 p-4 rounded-xl border border-amber-100">
-                  <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block mb-1">
-                    Problème signalé :
-                  </span>
-                  <p className="text-sm text-slate-700 leading-relaxed">
-                    {selectedIntervention.descriptionProbleme}
-                  </p>
-                </div>
-              )}
-
-              {selectedIntervention.prixTotal && (
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white shadow-xs flex items-center justify-center text-slate-500">
-                    <FaEuroSign size={14} />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 block">Prix total</span>
-                    <strong className="text-slate-800 font-semibold">{selectedIntervention.prixTotal} DH</strong>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <DialogFooter className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 sm:justify-end">
-              {selectedIntervention.statutReservation === "TERMINEE" ? (
-                <span className="px-4 py-1.5 bg-slate-100 text-slate-800 border border-slate-200 rounded-full text-xs font-bold">
-                  Terminée
-                </span>
-              ) : (selectedIntervention.statutReservation === "ACCEPTEE" || selectedIntervention.statutReservation === "EN_COURS") ? (
-                <Button
-                  onClick={() => handleTerminer(selectedIntervention.id)}
-                  disabled={actionLoading === selectedIntervention.id}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer gap-2"
-                >
-                  <FaCheck size={13} />
-                  {actionLoading === selectedIntervention.id ? "Terminaison..." : "Terminer"}
-                </Button>
-              ) : (
-                <span className="px-4 py-1.5 bg-slate-100 text-slate-800 border border-slate-200 rounded-full text-xs font-bold">
-                  {getStatutLabel(selectedIntervention.statutReservation)}
-                </span>
-              )}
-            </DialogFooter>
-          </DialogContent>
-        )}
-      </Dialog>
+      <InterventionDetailsModal
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        intervention={selectedIntervention}
+        onTerminer={handleTerminer}
+        actionLoading={actionLoading}
+      />
     </div>
   );
 };

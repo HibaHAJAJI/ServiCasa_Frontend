@@ -22,6 +22,7 @@ const DashboardArtisan = () => {
     nouvellesDemandes: 0,
     interventionsEnCours: 0,
     interventionsTerminees: 0,
+    revenusDuMois: 0,
   });
 
   const [demandes, setDemandes] = useState([]);
@@ -36,6 +37,7 @@ const DashboardArtisan = () => {
           nouvellesDemandes: data?.nouvellesDemandes ?? 0,
           interventionsEnCours: data?.interventionsEnCours ?? 0,
           interventionsTerminees: data?.interventionsTerminees ?? 0,
+          revenusDuMois: data?.revenusDuMois ?? 0,
         });
       } catch (error) {
         console.error("Erreur dashboard :", error);
@@ -90,7 +92,7 @@ const DashboardArtisan = () => {
     },
     {
       title: "Revenus du mois",
-      value: "0 DH",
+      value: `${dashboard.revenusDuMois ?? 0} DH`,
       icon: FaMoneyBillWave,
       iconColor: "text-indigo-600",
       iconBg: "bg-indigo-50",

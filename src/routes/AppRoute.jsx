@@ -10,12 +10,13 @@ import DashboardAdmin from '@/pages/dashboard/DashboardAdmin';
 import DashboardClient from '@/pages/dashboard/DashboardClient';
 
 import DemandesArtisan from '@/pages/artisans/DemandesArtisan';
-import InterventionsArtisan from '@/pages/artisans/InterventionsArtisan';
+import InterventionsArtisan from '@/pages/artisans/Intervention/InterventionsArtisan';
 import AvisArtisan from '@/pages/artisans/AvisArtisan';
 import DisponibilitesArtisan from '@/pages/artisans/disponibilites/DisponibilitesArtisan';
 import ServicesArtisan from '@/pages/artisans/servicesArtisan/ServicesArtisan';
 import Profile from '@/pages/profile/Profile';
 import MesReservations from '@/pages/client/MesReservations';
+import PaiementPage from '@/pages/paiement/PaiementPage';
 import NotFound from "../components/notFound/NotFound";
 import DashboardLayout from "../pages/dashboard/DashboardLayout";
 import Home from '@/pages/Home';
@@ -55,6 +56,7 @@ const AppRoutes = () => {
             element={<Navigate to="/client/dashboard" replace />}
           />
           <Route path="/client/reservations" element={<MesReservations />} />
+          <Route path="/paiement/:reservationId" element={<PaiementPage />} />
           <Route path="/client/profile" element={<Profile />} />
         </Route>
       </Route>

@@ -12,6 +12,11 @@ const disponibiliteService = {
     return response.data;
   },
 
+  getByArtisanAndDate: async (artisanId, date) => {
+    const response = await api.get(`/disponibilites/artisan/${artisanId}/date/${date}`);
+    return response.data;
+  },
+
   create: async (data) => {
     const response = await api.post("/disponibilites", data);
     return response.data;

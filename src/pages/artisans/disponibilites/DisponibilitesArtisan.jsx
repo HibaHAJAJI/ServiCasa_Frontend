@@ -210,7 +210,7 @@ const DisponibilitesArtisan = () => {
       setError("");
 
       const payload = {
-        jour: data.jour,
+        date: data.date,
         heureDebut: data.heureDebut || null,
         heureFin: data.heureFin || null,
         disponible: Boolean(data.disponible),

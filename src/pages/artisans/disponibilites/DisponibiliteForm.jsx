@@ -4,15 +4,15 @@ import { Clock3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-const jours = [
-  { value: "MONDAY", label: "Lundi" },
-  { value: "TUESDAY", label: "Mardi" },
-  { value: "WEDNESDAY", label: "Mercredi" },
-  { value: "THURSDAY", label: "Jeudi" },
-  { value: "FRIDAY", label: "Vendredi" },
-  { value: "SATURDAY", label: "Samedi" },
-  { value: "SUNDAY", label: "Dimanche" },
-];
+const formatTimeForInput = (t) => {
+  if (!t) return "";
+  if (typeof t === "string") return t.length === 5 ? t : t.slice(0, 5);
+  if (t instanceof Date) return t.toTimeString().slice(0, 5);
+  if (typeof t === "object" && t.hour !== undefined && t.minute !== undefined) {
+    return `${String(t.hour).padStart(2, "0")}:${String(t.minute).padStart(2, "0")}`;
+  }
+  return String(t);
+};
 
 const DisponibiliteForm = ({
   disponibilite,
@@ -21,9 +21,9 @@ const DisponibiliteForm = ({
   loading = false,
 }) => {
   const [formData, setFormData] = useState({
-    jour: disponibilite?.jour || "",
-    heureDebut: disponibilite?.heureDebut || "",
-    heureFin: disponibilite?.heureFin || "",
+    date: disponibilite?.date || "",
+    heureDebut: formatTimeForInput(disponibilite?.heureDebut),
+    heureFin: formatTimeForInput(disponibilite?.heureFin),
     disponible: disponibilite?.disponible ?? true,
   });
 
@@ -39,7 +39,7 @@ const DisponibiliteForm = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.jour) {
+    if (!formData.date) {
       return;
     }
 
@@ -57,32 +57,32 @@ const DisponibiliteForm = ({
       return;
     }
 
-    onSubmit(formData);
+    const payload = {
+      date: formData.date,
+      heureDebut: formData.heureDebut || null,
+      heureFin: formData.heureFin || null,
+      disponible: Boolean(formData.disponible),
+    };
+
+    onSubmit(payload);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-5 md:grid-cols-3">
         <div>
-          <Label htmlFor="jour">Jour</Label>
+          <Label htmlFor="date">Date</Label>
 
-          <select
-            id="jour"
-            name="jour"
-            value={formData.jour || ""}
+          <input
+            id="date"
+            name="date"
+            type="date"
+            value={formData.date || ""}
             onChange={handleChange}
             required
             disabled={loading}
             className="mt-2 h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none transition focus:border-[#0B1F3A] focus:ring-2 focus:ring-[#0B1F3A]/10 disabled:bg-slate-50"
-          >
-            <option value="">Choisir un jour</option>
-
-            {jours.map((jour) => (
-              <option key={jour.value} value={jour.value}>
-                {jour.label}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         <div>
@@ -136,11 +136,11 @@ const DisponibiliteForm = ({
 
         <div>
           <p className="text-sm font-medium text-[#0B1F3A]">
-            Disponible ce jour
+            Disponible cette date
           </p>
 
           <p className="mt-1 text-xs text-slate-500">
-            Décochez pour définir ce jour comme jour de repos.
+            Décochez pour définir cette date comme jour de repos.
           </p>
         </div>
       </label>

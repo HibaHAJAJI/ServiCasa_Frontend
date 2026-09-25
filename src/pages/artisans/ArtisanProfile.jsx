@@ -3,27 +3,22 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   Banknote,
   Briefcase,
-  Calendar,
   Clock,
   MapPin,
   Phone,
   Star,
+  Calendar,
 } from "lucide-react";
 
 import artisanService from "@/services/artisanService";
-import reservationService from "@/services/reservationService";
 import avisService from "@/services/avisService";
+import disponibiliteService from "@/services/disponibiliteService";
+import reservationService from "@/services/reservationService";
 import { useAuth } from "@/context/auth/AuthContext";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import ReservationCard from "./servicesArtisan/ReservationCard";
 
 const ArtisanProfile = () => {
   const { id } = useParams();
@@ -39,8 +34,14 @@ const ArtisanProfile = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dateIntervention, setDateIntervention] = useState("");
+  const [heureIntervention, setHeureIntervention] = useState("");
   const [adressIntervention, setAdressIntervention] = useState("");
   const [descriptionProbleme, setDescriptionProbleme] = useState("");
+
+  const [disponibilites, setDisponibilites] = useState([]);
+  const [selectedHeure, setSelectedHeure] = useState("");
+  const [loadingDisp, setLoadingDisp] = useState(false);
+  const [filteredSlots, setFilteredSlots] = useState([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -94,7 +95,72 @@ const ArtisanProfile = () => {
     fetchArtisan();
   }, [id]);
 
-  const handleOpenReservation = () => {
+  const loadDisponibilites = async (artisanId) => {
+    try {
+      setLoadingDisp(true);
+
+      const response = await disponibiliteService.getByArtisan(artisanId);
+
+      const data = Array.isArray(response)
+        ? response
+        : response?.content || response?.data || [];
+
+      setDisponibilites(data);
+    } catch (error) {
+      console.error("Erreur chargement disponibilités :", error);
+      setDisponibilites([]);
+    } finally {
+      setLoadingDisp(false);
+    }
+  };
+
+  const handleDateChange = async (e) => {
+    const date = e.target.value;
+
+    setDateIntervention(date);
+    setSelectedHeure("");
+    setHeureIntervention("");
+    setFilteredSlots([]);
+
+    if (!date || !artisan?.id) {
+      return;
+    }
+
+    try {
+      setLoadingDisp(true);
+
+      const response =
+        await disponibiliteService.getByArtisanAndDate(
+          artisan.id,
+          date
+        );
+
+      const data = Array.isArray(response)
+        ? response
+        : response?.content || response?.data || [];
+
+      const slots = data.filter((slot) => slot.disponible);
+      const fallbackSlots = disponibilites.filter(
+        (slot) =>
+          slot.disponible &&
+          String(slot.date).slice(0, 10) === date
+      );
+
+      setFilteredSlots(slots.length > 0 ? slots : fallbackSlots);
+    } catch (error) {
+      console.error("Erreur chargement disponibilités :", error);
+      setFilteredSlots([]);
+    } finally {
+      setLoadingDisp(false);
+    }
+  };
+
+  const handleSlotSelect = (slot) => {
+    setSelectedHeure(slot.heureDebut);
+    setHeureIntervention(slot.heureDebut);
+  };
+
+  const handleOpenReservation = async () => {
     if (!user) {
       navigate("/login", {
         state: {
@@ -106,6 +172,11 @@ const ArtisanProfile = () => {
 
     setSubmitError("");
     setSuccessMessage("");
+
+    if (artisan?.id) {
+      await loadDisponibilites(artisan.id);
+    }
+
     setIsModalOpen(true);
   };
 
@@ -117,6 +188,7 @@ const ArtisanProfile = () => {
 
     if (
       !dateIntervention ||
+      !selectedHeure ||
       !adressIntervention ||
       !descriptionProbleme
     ) {
@@ -129,9 +201,10 @@ const ArtisanProfile = () => {
 
       await reservationService.createReservation({
         artisanId: Number(id),
-        dateIntervention: `${dateIntervention}T09:00:00`,
+        dateIntervention: `${dateIntervention}T${selectedHeure}:00`,
         adressIntervention,
         descriptionProbleme,
+        prixTotal: artisan.tarifHoraire ?? 250,
       });
 
       setSuccessMessage(
@@ -139,8 +212,11 @@ const ArtisanProfile = () => {
       );
 
       setDateIntervention("");
+      setSelectedHeure("");
+      setHeureIntervention("");
       setAdressIntervention("");
       setDescriptionProbleme("");
+      setFilteredSlots([]);
 
       setTimeout(() => {
         setIsModalOpen(false);
@@ -364,8 +440,7 @@ const ArtisanProfile = () => {
                   </span>
 
                   <span className="text-sm text-slate-500">
-                    {Number(nombreAvis)}{" "}
-                    {Number(nombreAvis) === 1 ? "avis" : "avis"}
+                    {Number(nombreAvis)} avis
                   </span>
                 </div>
               </div>
@@ -382,109 +457,28 @@ const ArtisanProfile = () => {
         </CardContent>
       </Card>
 
-      <Dialog
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-      >
-        <DialogContent className="max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-[#0B1F3A]">
-              Réserver {artisan.prenom} {artisan.nom}
-            </DialogTitle>
-
-            <DialogDescription>
-              Remplissez les informations de votre intervention.
-            </DialogDescription>
-          </DialogHeader>
-
-          {successMessage ? (
-            <div className="p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 text-sm text-center">
-              {successMessage}
-            </div>
-          ) : (
-            <form
-              onSubmit={handleBookingSubmit}
-              className="space-y-4"
-            >
-              {submitError && (
-                <div className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-200 text-sm">
-                  {submitError}
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Date d'intervention
-                </label>
-
-                <input
-                  type="date"
-                  required
-                  value={dateIntervention}
-                  onChange={(e) =>
-                    setDateIntervention(e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Adresse d'intervention
-                </label>
-
-                <input
-                  type="text"
-                  required
-                  placeholder="Adresse de l'intervention"
-                  value={adressIntervention}
-                  onChange={(e) =>
-                    setAdressIntervention(e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Description du problème
-                </label>
-
-                <textarea
-                  required
-                  rows={4}
-                  placeholder="Décrivez le problème..."
-                  value={descriptionProbleme}
-                  onChange={(e) =>
-                    setDescriptionProbleme(e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  Annuler
-                </Button>
-
-                <Button
-                  type="submit"
-                  disabled={submitting}
-                  className="bg-[#0B1F3A] hover:bg-[#132d52] text-white"
-                >
-                  {submitting
-                    ? "Envoi..."
-                    : "Confirmer la réservation"}
-                </Button>
-              </div>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ReservationCard
+        artisan={artisan}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        dateIntervention={dateIntervention}
+        setDateIntervention={setDateIntervention}
+        heureIntervention={heureIntervention}
+        setHeureIntervention={setHeureIntervention}
+        adressIntervention={adressIntervention}
+        setAdressIntervention={setAdressIntervention}
+        descriptionProbleme={descriptionProbleme}
+        setDescriptionProbleme={setDescriptionProbleme}
+        loadingDisp={loadingDisp}
+        filteredSlots={filteredSlots}
+        selectedHeure={selectedHeure}
+        handleDateChange={handleDateChange}
+        handleSlotSelect={handleSlotSelect}
+        handleBookingSubmit={handleBookingSubmit}
+        submitting={submitting}
+        submitError={submitError}
+        successMessage={successMessage}
+      />
     </div>
   );
 };

@@ -31,8 +31,6 @@ api.interceptors.response.use(
       console.error("Erreur 403: Accès refusé (Droits insuffisants)");
     } else if (status === 400) {
       console.error("Erreur 400: Requête invalide");
-    } else if (status === 404) {
-      console.error("Erreur 404: Ressource introuvable");
     } else if (status >= 500) {
       console.error("Erreur 500: Erreur serveur interne");
     }
