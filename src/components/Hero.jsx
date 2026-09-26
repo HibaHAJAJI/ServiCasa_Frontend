@@ -1,14 +1,32 @@
 import { useState } from "react";
-import { FaSearch, FaMapMarkerAlt, FaTools, FaStar } from "react-icons/fa";
+import {
+  FaSearch,
+  FaMapMarkerAlt,
+  FaTools,
+  FaStar,
+} from "react-icons/fa";
 
 import heroImage from "../assets/image.png";
+import SpecialiteSelect from "../components/filters/SpecialiteSelect";
+import VilleSelect from "../components/filters/VilleSelect";
 
-const Hero = ({ onSearch, onUseMyPosition, locating }) => {
+const Hero = ({
+  onSearch,
+  onUseMyPosition,
+  locating,
+  villes = [],
+  specialites = [],
+  filtersLoading = false,
+}) => {
   const [specialite, setSpecialite] = useState("");
   const [ville, setVille] = useState("");
 
   const handleSearch = () => {
     onSearch?.(specialite, ville);
+  };
+
+  const handleUseMyPosition = () => {
+    onUseMyPosition?.(setVille);
   };
 
   return (
@@ -37,38 +55,33 @@ const Hero = ({ onSearch, onUseMyPosition, locating }) => {
 
               <div className="mt-8">
                 <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm md:flex-row md:items-center">
-                  <label className="flex flex-1 items-center gap-3 rounded-xl px-4">
+                  <div className="flex flex-1 items-center gap-3 rounded-xl px-4">
                     <FaTools className="shrink-0 text-[#0B1F3A]" />
-                    <select
+
+                    <SpecialiteSelect
+                      specialites={specialites}
                       value={specialite}
-                      onChange={(e) => setSpecialite(e.target.value)}
-                      className="w-full cursor-pointer bg-transparent py-2 text-sm font-medium text-[#0B1F3A] outline-none"
-                    >
-                      <option value="">Toutes les spécialités</option>
-                      <option value="Plomberie">Plomberie</option>
-                      <option value="Électricité">Électricité</option>
-                      <option value="Peinture">Peinture</option>
-                      <option value="Climatisation">Climatisation</option>
-                    </select>
-                  </label>
+                      onChange={setSpecialite}
+                    />
+                  </div>
 
                   <div className="hidden w-px bg-slate-200 md:block" />
 
-                  <label className="flex flex-1 items-center gap-3 rounded-xl px-4">
+                  <div className="flex flex-1 items-center gap-3 rounded-xl px-4">
                     <FaMapMarkerAlt className="shrink-0 text-[#0B1F3A]" />
-                    <input
-                      type="text"
+
+                    <VilleSelect
+                      villes={villes}
                       value={ville}
-                      onChange={(e) => setVille(e.target.value)}
-                      placeholder="Votre ville"
-                      className="w-full bg-transparent py-2 text-sm font-medium text-[#0B1F3A] outline-none placeholder:text-slate-400"
+                      onChange={setVille}
                     />
-                  </label>
+                  </div>
 
                   <button
                     type="button"
                     onClick={handleSearch}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0B1F3A] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#132d52]"
+                    disabled={filtersLoading}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0B1F3A] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#132d52] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <FaSearch className="text-sm" />
                     Rechercher
@@ -78,26 +91,42 @@ const Hero = ({ onSearch, onUseMyPosition, locating }) => {
                 <button
                   type="button"
                   disabled={locating}
-                  onClick={() => onUseMyPosition?.((value) => setVille(value))}
+                  onClick={handleUseMyPosition}
                   className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <FaMapMarkerAlt className="text-xs" />
-                  {locating ? "Localisation en cours..." : "Utiliser ma position"}
+
+                  {locating
+                    ? "Localisation en cours..."
+                    : "Utiliser ma position"}
                 </button>
               </div>
 
               <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
                 <div className="flex items-center gap-2">
                   <FaStar className="text-yellow-400" />
+
                   <div>
-                    <span className="font-bold text-[#0B1F3A]">4.8/5</span>
-                    <span className="text-sm text-slate-500 ml-2">Satisfaction client</span>
+                    <span className="font-bold text-[#0B1F3A]">
+                      4.8/5
+                    </span>
+
+                    <span className="text-sm text-slate-500 ml-2">
+                      Satisfaction client
+                    </span>
                   </div>
                 </div>
+
                 <div className="hidden sm:block w-px h-6 bg-slate-200" />
+
                 <div>
-                  <span className="font-bold text-[#0B1F3A]">+500</span>
-                  <span className="text-sm text-slate-500 ml-2">Artisans vérifiés</span>
+                  <span className="font-bold text-[#0B1F3A]">
+                    +500
+                  </span>
+
+                  <span className="text-sm text-slate-500 ml-2">
+                    Artisans vérifiés
+                  </span>
                 </div>
               </div>
 
@@ -114,6 +143,7 @@ const Hero = ({ onSearch, onUseMyPosition, locating }) => {
             <div className="relative w-full">
               <div className="relative">
                 <div className="absolute -inset-3 bg-red-50 rounded-[2rem] -z-10" />
+
                 <img
                   src={heroImage}
                   alt="Client et artisan ServiCasa"

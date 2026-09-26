@@ -54,13 +54,17 @@ const Home = () => {
   const [error, setError] = useState("");
   const [locating, setLocating] = useState(false);
 
-  const handleSearch = async (specialite = "", ville = "") => {
+  const [villes, setVilles] = useState([]);
+  const [specialites, setSpecialites] = useState([]);
+  const [filtersLoading, setFiltersLoading] = useState(true);
+
+  const handleSearch = async (specialite = null, ville = null) => {
     setLoading(true);
     setError("");
 
     try {
-      const s = (specialite || "").trim();
-      const v = (ville || "").trim();
+      const s = (specialite?.nom || "").trim();
+      const v = (ville?.nom || "").trim();
 
       const res = await artisanService.searchArtisans(s, v);
       const items = res?.content ?? [];
@@ -73,6 +77,31 @@ const Home = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const data = await artisanService.getVilles();
+        setVilles(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Erreur lors de la récupération des villes :", err);
+        setVilles([]);
+      }
+
+      try {
+        const data = await artisanService.getSpecialites();
+        const list = Array.isArray(data) ? data : (data?.content || []);
+        setSpecialites(list);
+      } catch (err) {
+        console.error("Erreur lors de la récupération des spécialités :", err);
+        setSpecialites([]);
+      }
+
+      setFiltersLoading(false);
+    };
+
+    loadFilters();
+  }, []);
 
   useEffect(() => {
     const loadArtisans = async () => {
@@ -154,6 +183,9 @@ const Home = () => {
         onSearch={handleSearch}
         onUseMyPosition={handleUseMyPosition}
         locating={locating}
+        villes={villes}
+        specialites={specialites}
+        filtersLoading={filtersLoading}
       />
 
       <NearbyArtisans

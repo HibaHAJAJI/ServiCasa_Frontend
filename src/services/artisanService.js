@@ -27,6 +27,16 @@ const artisanService = {
     return response.data;
   },
 
+  getVilles: async () => {
+    const response = await api.get("/villes");
+    return response.data;
+  },
+
+  getSpecialites: async () => {
+    const response = await api.get("/specialites");
+    return response.data;
+  },
+
   searchArtisans: async (specialite = "", ville = "") => {
     const s = (specialite || "").trim();
     const v = (ville || "").trim();
