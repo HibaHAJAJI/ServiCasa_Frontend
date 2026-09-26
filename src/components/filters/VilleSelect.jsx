@@ -10,11 +10,14 @@ const VilleSelect = ({
   villes = [],
   value,
   onChange,
+  disabled = false,
 }) => {
+  const selectValue = value === "" || value == null ? undefined : String(value);
+
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={selectValue} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger className="w-full border-0 shadow-none">
-        <SelectValue placeholder="Toutes les villes" />
+        <SelectValue placeholder="Sélectionnez une ville" />
       </SelectTrigger>
 
       <SelectContent>

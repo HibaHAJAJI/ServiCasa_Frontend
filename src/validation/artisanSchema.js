@@ -29,7 +29,7 @@ export const artisanSchema = yup.object().shape({
   password: yup
     .string()
     .required('Le mot de passe est requis')
-    .min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+    .min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
 
   specialite: yup
     .string()
