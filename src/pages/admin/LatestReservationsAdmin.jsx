@@ -17,10 +17,11 @@ const LatestReservationsAdmin = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await reservationService.getLatestReservations(0, 5);
-        setReservations(data.content || data);
-      } catch (err) {
-        console.error("Erreur:", err);
+        const data = await reservationService.getAllReservations(0, 5, "", "");
+        const list = Array.isArray(data) ? data : data?.content || [];
+        setReservations(list);
+      } catch (error) {
+        console.error("Erreur:", error);
       } finally {
         setLoading(false);
       }
@@ -40,73 +41,71 @@ const LatestReservationsAdmin = () => {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs w-full">
-      <div className="w-full">
-        <Table className="w-full border-collapse">
-          <TableHeader>
-            <TableRow className="bg-slate-50 hover:bg-slate-50">
-              <TableHead className="border border-slate-200 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Client
-              </TableHead>
-              <TableHead className="border border-slate-200 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Artisan
-              </TableHead>
-              <TableHead className="border border-slate-200 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Date
-              </TableHead>
-              <TableHead className="border border-slate-200 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Statut
-              </TableHead>
+    <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
+      <Table className="w-full">
+        <TableHeader>
+          <TableRow className="bg-slate-50 hover:bg-slate-50">
+            <TableHead>Client</TableHead>
+            <TableHead>Artisan</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead className="text-center">Statut</TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {reservations.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={4}
+                className="py-8 text-center text-sm text-slate-500"
+              >
+                Aucune réservation récente
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {reservations.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="border border-slate-200 py-8 text-center text-sm text-slate-500"
-                >
-                  Aucune réservation récente
-                </TableCell>
-              </TableRow>
-            ) : (
-              reservations.map((item) => (
+          ) : (
+            reservations.map((item) => {
+              const statut = item.statutReservation;
+
+              return (
                 <TableRow
                   key={item.id}
-                  className="hover:bg-slate-50 transition-colors"
+                  className="transition-colors hover:bg-slate-50"
                 >
-                  <TableCell className="border border-slate-200 px-4 py-3 font-medium text-[#0B1F3A]">
+                  <TableCell className="font-medium text-[#0B1F3A]">
                     {item.clientNom}
                   </TableCell>
-                  <TableCell className="border border-slate-200 px-4 py-3 text-sm text-slate-600">
+
+                  <TableCell className="text-sm text-slate-600">
                     {item.artisanNom || "Non assigné"}
                   </TableCell>
-                  <TableCell className="border border-slate-200 px-4 py-3 text-sm text-slate-600">
+
+                  <TableCell className="text-sm text-slate-600">
                     {item.dateReservation}
                   </TableCell>
-                  <TableCell className="border border-slate-200 px-4 py-3 text-center">
+
+                  <TableCell className="text-center">
                     <span
                       className={`inline-flex min-w-[90px] justify-center rounded-full px-2.5 py-1 text-xs font-medium ${
-                        item.statut === "EN_ATTENTE"
+                        statut === "EN_ATTENTE"
                           ? "bg-amber-50 text-amber-700"
-                          : item.statut === "ACCEPTEE"
+                          : statut === "ACCEPTEE"
                           ? "bg-blue-50 text-blue-700"
-                          : item.statut === "TERMINEE"
+                          : statut === "TERMINEE"
                           ? "bg-emerald-50 text-emerald-700"
-                          : item.statut === "REFUSEE"
+                          : statut === "REFUSEE"
                           ? "bg-red-50 text-red-700"
                           : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      {item.statut}
+                      {statut}
                     </span>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              );
+            })
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };

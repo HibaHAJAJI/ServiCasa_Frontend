@@ -24,6 +24,12 @@ import Artisans from '@/pages/artisans/Artisans';
 import ArtisanProfile from '@/pages/artisans/ArtisanProfile';
 
 import AuthGuard from '../guards/AuthGuard';
+import RoleGuard from '../guards/RoleGuard';
+
+// Admin pages
+import PendingArtisansAdmin from '@/pages/admin/PendingArtisansAdmin';
+import AdminCategories from '@/pages/admin/AdminCategories';
+import LatestReservationsAdmin from '@/pages/admin/LatestReservationsAdmin';
 
 const AppRoutes = () => {
   return (
@@ -48,8 +54,6 @@ const AppRoutes = () => {
           <Route path="/artisan/services" element={<ServicesArtisan />} />
           <Route path="/profile" element={<Profile />} />
 
-          <Route path="/dashboard/admin" element={<DashboardAdmin />} />
-
           <Route path="/client/dashboard" element={<DashboardClient />} />
           <Route
             path="/dashboard/client"
@@ -58,6 +62,18 @@ const AppRoutes = () => {
           <Route path="/client/reservations" element={<MesReservations />} />
           <Route path="/paiement/:reservationId" element={<PaiementPage />} />
           <Route path="/client/profile" element={<Profile />} />
+        </Route>
+      </Route>
+
+      {/* Routes Admin - protégées par AuthGuard + RoleGuard (ADMIN only) */}
+      <Route element={<AuthGuard />}>
+        <Route element={<RoleGuard allowedRoles={["ROLE_ADMIN"]} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard/admin" element={<DashboardAdmin />} />
+            <Route path="/admin/artisans/validation" element={<PendingArtisansAdmin />} />
+            <Route path="/admin/categories" element={<AdminCategories />} />
+            <Route path="/admin/reservations" element={<LatestReservationsAdmin />} />
+          </Route>
         </Route>
       </Route>
 

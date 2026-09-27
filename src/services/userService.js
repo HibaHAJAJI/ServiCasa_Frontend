@@ -6,10 +6,15 @@ const userService = {
     return response.data;
   },
 
+  getAllClients: async (page = 0, size = 10) => {
+    const response = await api.get(`/users/clients?page=${page}&size=${size}`);
+    return response.data;
+  },
+
   updateProfile: async (data) => {
-  const response = await api.put("/users/profile", data);
-  return response.data;
-},
+    const response = await api.put("/users/profile", data);
+    return response.data;
+  },
 
   updateClientProfile: async (data) => {
     const response = await api.put("/users/client/profile", data);

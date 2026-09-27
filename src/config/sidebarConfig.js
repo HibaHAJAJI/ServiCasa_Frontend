@@ -9,6 +9,7 @@ import {
   FaStar,
   FaClock,
   FaWrench,
+  FaUsers,
 } from "react-icons/fa";
 
 const sidebarConfig = {
@@ -79,7 +80,6 @@ const sidebarConfig = {
       path: "/admin/reservations",
       icon: FaClipboardList,
     },
-
   ],
 };
 

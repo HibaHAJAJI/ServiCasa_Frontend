@@ -24,7 +24,7 @@ const VilleSelect = ({
         {villes.map((ville) => (
           <SelectItem
             key={ville.id}
-            value={String(ville.id)}
+            value={ville.nom}
           >
             {ville.nom}
           </SelectItem>
