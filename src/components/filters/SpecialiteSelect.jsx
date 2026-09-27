@@ -24,7 +24,7 @@ const SpecialiteSelect = ({
         {specialites.map((specialite) => (
           <SelectItem
             key={specialite.id}
-            value={String(specialite.id)}
+            value={specialite.nom}
           >
             {specialite.nom}
           </SelectItem>

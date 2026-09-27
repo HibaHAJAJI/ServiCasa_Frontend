@@ -14,11 +14,11 @@ import {
   FaClipboardList,
   FaCheckCircle,
   FaHourglassHalf,
+  FaUserClock,
 } from "react-icons/fa";
 
 import adminDashboardService from "../../services/adminDashboardService";
-import LatestReservationsAdmin from "../admin/LatestReservationsAdmin";
-import PendingArtisansAdmin from "../admin/PendingArtisansAdmin";
+import LatestReservationsAdmin from "@/pages/admin/LatestReservationsAdmin";
 
 const DashboardAdmin = () => {
   const [dashboard, setDashboard] = useState({
@@ -28,20 +28,66 @@ const DashboardAdmin = () => {
     totalReservations: 0,
     pendingReservations: 0,
     completedReservations: 0,
+    pendingArtisans: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const data = await adminDashboardService.getDashboard();
         setDashboard(data);
       } catch (error) {
         console.error("Erreur dashboard admin :", error);
+        setError("Impossible de charger le tableau de bord.");
+      } finally {
+        setLoading(false);
       }
     };
 
     loadDashboard();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full space-y-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {[...Array(7)].map((_, i) => (
+            <Card key={i} className="border-gray-200 bg-white shadow-sm animate-pulse">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  <span className="h-4 w-24 bg-gray-200 rounded" />
+                </CardTitle>
+                <div className="h-10 w-10 rounded-xl bg-gray-200" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-extrabold text-gray-200">
+                  <span className="h-8 w-16 bg-gray-200 rounded inline-block" />
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700 text-center">
+        <p className="font-medium">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 text-sm text-red-600 hover:underline"
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
 
   const stats = [
     {
@@ -64,6 +110,13 @@ const DashboardAdmin = () => {
       icon: FaUserTie,
       iconColor: "text-indigo-600",
       iconBg: "bg-indigo-50",
+    },
+    {
+      title: "Artisans en attente",
+      value: dashboard.pendingArtisans,
+      icon: FaUserClock,
+      iconColor: "text-amber-600",
+      iconBg: "bg-amber-50",
     },
     {
       title: "Total Réservations",
@@ -90,7 +143,7 @@ const DashboardAdmin = () => {
 
   return (
     <div className="w-full space-y-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
         {stats.map((stat) => {
           const Icon = stat.icon;
 
@@ -128,16 +181,6 @@ const DashboardAdmin = () => {
 
           <div className="w-full overflow-x-auto">
             <LatestReservationsAdmin />
-          </div>
-        </div>
-
-        <div className="min-w-0 space-y-3">
-          <h3 className="text-base font-bold text-[#0B1F3A] px-1">
-            Validation des artisans
-          </h3>
-
-          <div className="w-full overflow-x-auto">
-            <PendingArtisansAdmin />
           </div>
         </div>
 

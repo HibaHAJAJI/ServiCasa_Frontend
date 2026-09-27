@@ -58,13 +58,13 @@ const Home = () => {
   const [specialites, setSpecialites] = useState([]);
   const [filtersLoading, setFiltersLoading] = useState(true);
 
-  const handleSearch = async (specialite = null, ville = null) => {
+  const handleSearch = async (specialite = "", ville = "") => {
     setLoading(true);
     setError("");
 
     try {
-      const s = (specialite?.nom || "").trim();
-      const v = (ville?.nom || "").trim();
+      const s = (specialite || "").trim();
+      const v = (ville || "").trim();
 
       const res = await artisanService.searchArtisans(s, v);
       const items = res?.content ?? [];

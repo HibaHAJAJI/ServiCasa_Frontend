@@ -27,6 +27,16 @@ const reservationService = {
     return response.data;
   },
 
+  getAllReservations: async (page = 0, size = 10, search = "", statut = "") => {
+    const params = new URLSearchParams();
+    params.append("page", page);
+    params.append("size", size);
+    if (search) params.append("search", search);
+    if (statut) params.append("statut", statut);
+    const response = await api.get(`/reservations/admin?${params.toString()}`);
+    return response.data;
+  },
+
   createReservation: async (data) => {
     const response = await api.post("/reservations", data);
     return response.data;
