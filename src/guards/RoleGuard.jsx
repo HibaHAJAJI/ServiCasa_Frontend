@@ -1,12 +1,28 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
+const roleHome = {
+  ROLE_ARTISAN: "/dashboard/artisan",
+  ROLE_CLIENT: "/client/dashboard",
+  ROLE_ADMIN: "/dashboard/admin",
+};
+
 function RoleGuard({ allowedRoles }) {
   const token = localStorage.getItem("token");
-  const user = jwtDecode(token);
 
-  if (!allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  let role;
+  try {
+    role = jwtDecode(token).role;
+  } catch {
+    role = null;
+  }
+
+  if (!role || !allowedRoles.includes(role)) {
+    return <Navigate to={roleHome[role] || "/login"} replace />;
   }
 
   return <Outlet />;

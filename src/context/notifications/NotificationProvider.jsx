@@ -1,23 +1,46 @@
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../auth/AuthContext";
 import notificationSocketService from "../../services/notificationService";
+import { isNotificationAllowedForRole } from "../../config/notificationTypes";
+import { getRole, isNotificationRecipient } from "../../lib/roles";
 import NotificationContext from "./NotificationContext";
 
+let notificationCounter = 0;
+const nextNotificationId = () => {
+  notificationCounter += 1;
+  return `notification-${Date.now()}-${notificationCounter}`;
+};
+
 export const NotificationProvider = ({ children }) => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const role = getRole(user);
+  const canReceiveNotifications = isNotificationRecipient(user);
+
   const [notifications, setNotifications] = useState([]);
+  const [recipientKey, setRecipientKey] = useState(null);
+
+  const currentRecipientKey = canReceiveNotifications && token ? `${role}:${token}` : null;
+
+  if (currentRecipientKey !== recipientKey) {
+    setRecipientKey(currentRecipientKey);
+    setNotifications([]);
+  }
 
   useEffect(() => {
-    if (!token) {
+    if (!currentRecipientKey) {
       notificationSocketService.disconnect();
       return;
     }
 
-    notificationSocketService.connect(token, (newNotification) => {
+    notificationSocketService.connect(token, (incoming) => {
+      if (!isNotificationAllowedForRole(incoming?.type, role)) {
+        return;
+      }
+
       const notification = {
-        id: Date.now() + Math.random(),
+        ...incoming,
+        id: incoming?.id ?? nextNotificationId(),
         read: false,
-        ...newNotification,
       };
 
       setNotifications((prev) => [notification, ...prev]);
@@ -26,7 +49,7 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       notificationSocketService.disconnect();
     };
-  }, [token]);
+  }, [currentRecipientKey, role, token]);
 
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.read).length,
@@ -42,9 +65,7 @@ export const NotificationProvider = ({ children }) => {
   };
 
   const markAllAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((notification) => ({ ...notification, read: true }))
-    );
+    setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })));
   };
 
   const clearNotifications = () => {
@@ -58,8 +79,10 @@ export const NotificationProvider = ({ children }) => {
       markAsRead,
       markAllAsRead,
       clearNotifications,
+      role,
+      canReceiveNotifications,
     }),
-    [notifications, unreadCount]
+    [notifications, unreadCount, role, canReceiveNotifications]
   );
 
   return (

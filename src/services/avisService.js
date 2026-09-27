@@ -27,6 +27,19 @@ const avisService = {
     return response.data;
   },
 
+
+  findAvisByReservation: async (reservationId) => {
+    try {
+      const response = await api.get(`/avis/reservation/${reservationId}`);
+      return response.data;
+    } catch (error) {
+      if (error?.response?.status === 404) {
+        return null;
+      }
+      throw error;
+    }
+  },
+
   checkAvisExists: async (reservationId) => {
     const response = await api.get(`/avis/reservation/${reservationId}/exists`);
     return response.data;

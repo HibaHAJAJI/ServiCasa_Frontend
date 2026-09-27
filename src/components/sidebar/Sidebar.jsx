@@ -1,4 +1,3 @@
-// src/components/sidebar/Sidebar.jsx
 import { NavLink } from "react-router-dom";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "../../context/auth/AuthContext";
@@ -24,7 +23,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             <NavLink
               key={item.path}
               to={item.path}
-              end={item.path === "/artisan/dashboard" || item.path === "/client/dashboard"}
+              end={item.path === "/dashboard/artisan" || item.path === "/client/dashboard"}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
                   isActive
@@ -39,7 +38,6 @@ const Sidebar = ({ isOpen, onClose }) => {
           );
         })}
 
-        {/* Mon profil — chemin dynamique selon le rôle */}
         <NavLink
           to={profilePath}
           onClick={onClose}
@@ -56,7 +54,6 @@ const Sidebar = ({ isOpen, onClose }) => {
         </NavLink>
       </nav>
 
-      {/* Déconnexion */}
       <div className="p-4 border-t border-slate-200 bg-slate-50/50">
         <button
           onClick={() => {

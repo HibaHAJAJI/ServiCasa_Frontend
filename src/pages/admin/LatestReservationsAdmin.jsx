@@ -10,25 +10,77 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+const LATEST_LIMIT = 5;
+
+const fullName = (prenom, nom) => [prenom, nom].filter(Boolean).join(" ").trim();
+
+const toTime = (value) => {
+  const time = value ? new Date(value).getTime() : NaN;
+  return Number.isNaN(time) ? -Infinity : time;
+};
+
+const byMostRecent = (a, b) => {
+  const diff = toTime(b?.dateReservation) - toTime(a?.dateReservation);
+  return Number.isNaN(diff) ? 0 : diff;
+};
+
+const formatDate = (value) => {
+  if (!value) return "—";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "—";
+  return parsed.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 const LatestReservationsAdmin = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
-    const fetchData = async () => {
+    let cancelled = false;
+
+    const load = async () => {
       try {
-        const data = await reservationService.getAllReservations(0, 5, "", "");
-        const list = Array.isArray(data) ? data : data?.content || [];
-        setReservations(list);
-      } catch (error) {
-        console.error("Erreur:", error);
+      
+        const data = await reservationService.getLatestReservations(0, LATEST_LIMIT);
+        if (cancelled) return;
+        const list = Array.isArray(data) ? data : data?.content ?? [];
+        setReservations([...list].sort(byMostRecent));
+        setError(null);
+      } catch (err) {
+        if (cancelled) return;
+        console.error("Erreur chargement des dernières réservations :", err);
+        setReservations([]);
+        setError(
+          err?.response?.status === 403
+            ? "Accès refusé : droits insuffisants pour consulter les réservations."
+            : "Impossible de charger les dernières réservations."
+        );
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadToken]);
+
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    setReloadToken((token) => token + 1);
+  };
 
   if (loading) {
     return (
@@ -53,7 +105,20 @@ const LatestReservationsAdmin = () => {
         </TableHeader>
 
         <TableBody>
-          {reservations.length === 0 ? (
+          {error ? (
+            <TableRow>
+              <TableCell colSpan={4} className="py-8 text-center">
+                <p className="text-sm text-red-600">{error}</p>
+                <button
+                  type="button"
+                  onClick={handleRetry}
+                  className="mt-2 text-xs text-red-600 hover:underline"
+                >
+                  Réessayer
+                </button>
+              </TableCell>
+            </TableRow>
+          ) : reservations.length === 0 ? (
             <TableRow>
               <TableCell
                 colSpan={4}
@@ -65,6 +130,8 @@ const LatestReservationsAdmin = () => {
           ) : (
             reservations.map((item) => {
               const statut = item.statutReservation;
+              const client = fullName(item.clientPrenom, item.clientNom) || "—";
+              const artisan = fullName(item.artisanPrenom, item.artisanNom) || "Non assigné";
 
               return (
                 <TableRow
@@ -72,15 +139,15 @@ const LatestReservationsAdmin = () => {
                   className="transition-colors hover:bg-slate-50"
                 >
                   <TableCell className="font-medium text-[#0B1F3A]">
-                    {item.clientNom}
+                    {client}
                   </TableCell>
 
                   <TableCell className="text-sm text-slate-600">
-                    {item.artisanNom || "Non assigné"}
+                    {artisan}
                   </TableCell>
 
                   <TableCell className="text-sm text-slate-600">
-                    {item.dateReservation}
+                    {formatDate(item.dateReservation)}
                   </TableCell>
 
                   <TableCell className="text-center">
@@ -97,7 +164,7 @@ const LatestReservationsAdmin = () => {
                           : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      {statut}
+                      {statut || "—"}
                     </span>
                   </TableCell>
                 </TableRow>

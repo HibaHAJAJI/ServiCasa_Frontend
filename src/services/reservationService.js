@@ -17,7 +17,7 @@ const reservationService = {
     return response.data;
   },
 
-  getLatestReservations : async (page = 0, size = 5) => {
+  getLatestReservations: async (page = 0, size = 5) => {
     const response = await api.get(`/reservations/latest?page=${page}&size=${size}`);
     return response.data;
   },
@@ -27,13 +27,11 @@ const reservationService = {
     return response.data;
   },
 
-  getAllReservations: async (page = 0, size = 10, search = "", statut = "") => {
+  getAllReservations: async (page = 0, size = 10) => {
     const params = new URLSearchParams();
     params.append("page", page);
     params.append("size", size);
-    if (search) params.append("search", search);
-    if (statut) params.append("statut", statut);
-    const response = await api.get(`/reservations/admin?${params.toString()}`);
+    const response = await api.get(`/reservations?${params.toString()}`);
     return response.data;
   },
 

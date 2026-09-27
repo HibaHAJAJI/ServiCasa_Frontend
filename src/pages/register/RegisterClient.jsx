@@ -12,7 +12,6 @@ import VilleSelect from "../../components/filters/VilleSelect";
 import {
   FaUser,
   FaPhone,
-  FaCity,
   FaEnvelope,
   FaLock,
   FaEye,

@@ -11,7 +11,7 @@ import DashboardClient from '@/pages/dashboard/DashboardClient';
 
 import DemandesArtisan from '@/pages/artisans/DemandesArtisan';
 import InterventionsArtisan from '@/pages/artisans/Intervention/InterventionsArtisan';
-import AvisArtisan from '@/pages/artisans/AvisArtisan';
+import AvisArtisan from '@/components/avis/AvisArtisan';
 import DisponibilitesArtisan from '@/pages/artisans/disponibilites/DisponibilitesArtisan';
 import ServicesArtisan from '@/pages/artisans/servicesArtisan/ServicesArtisan';
 import Profile from '@/pages/profile/Profile';
@@ -26,7 +26,6 @@ import ArtisanProfile from '@/pages/artisans/ArtisanProfile';
 import AuthGuard from '../guards/AuthGuard';
 import RoleGuard from '../guards/RoleGuard';
 
-// Admin pages
 import PendingArtisansAdmin from '@/pages/admin/PendingArtisansAdmin';
 import AdminCategories from '@/pages/admin/AdminCategories';
 import LatestReservationsAdmin from '@/pages/admin/LatestReservationsAdmin';
@@ -46,26 +45,30 @@ const AppRoutes = () => {
 
       <Route element={<AuthGuard />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/dashboard/artisan" element={<Dashboard />} />
-          <Route path="/artisan/demandes" element={<DemandesArtisan />} />
-          <Route path="/artisan/interventions" element={<InterventionsArtisan />} />
-          <Route path="/artisan/avis" element={<AvisArtisan />} />
-          <Route path="/artisan/disponibilites" element={<DisponibilitesArtisan />} />
-          <Route path="/artisan/services" element={<ServicesArtisan />} />
+          <Route element={<RoleGuard allowedRoles={["ROLE_ARTISAN"]} />}>
+            <Route path="/dashboard/artisan" element={<Dashboard />} />
+            <Route path="/artisan/demandes" element={<DemandesArtisan />} />
+            <Route path="/artisan/interventions" element={<InterventionsArtisan />} />
+            <Route path="/artisan/avis" element={<AvisArtisan />} />
+            <Route path="/artisan/disponibilites" element={<DisponibilitesArtisan />} />
+            <Route path="/artisan/services" element={<ServicesArtisan />} />
+          </Route>
+
           <Route path="/profile" element={<Profile />} />
 
-          <Route path="/client/dashboard" element={<DashboardClient />} />
-          <Route
-            path="/dashboard/client"
-            element={<Navigate to="/client/dashboard" replace />}
-          />
-          <Route path="/client/reservations" element={<MesReservations />} />
-          <Route path="/paiement/:reservationId" element={<PaiementPage />} />
-          <Route path="/client/profile" element={<Profile />} />
+          <Route element={<RoleGuard allowedRoles={["ROLE_CLIENT"]} />}>
+            <Route path="/client/dashboard" element={<DashboardClient />} />
+            <Route
+              path="/dashboard/client"
+              element={<Navigate to="/client/dashboard" replace />}
+            />
+            <Route path="/client/reservations" element={<MesReservations />} />
+            <Route path="/paiement/:reservationId" element={<PaiementPage />} />
+            <Route path="/client/profile" element={<Profile />} />
+          </Route>
         </Route>
       </Route>
 
-      {/* Routes Admin - protégées par AuthGuard + RoleGuard (ADMIN only) */}
       <Route element={<AuthGuard />}>
         <Route element={<RoleGuard allowedRoles={["ROLE_ADMIN"]} />}>
           <Route element={<DashboardLayout />}>

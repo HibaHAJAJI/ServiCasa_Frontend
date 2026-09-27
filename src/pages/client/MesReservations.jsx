@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import AvisForm from "@/components/avis/AvisForm";
 import reservationService from "@/services/reservationService";
 import paiementService from "@/services/paiementService";
+import avisService from "@/services/avisService";
 
 const statutLabel = {
   EN_ATTENTE: "En attente",
@@ -24,6 +27,10 @@ const statutColor = {
 
 const canCancel = (statut) => statut === "EN_ATTENTE" || statut === "ACCEPTEE";
 
+const canReview = (statut) => statut === "TERMINEE";
+
+const STARS = [1, 2, 3, 4, 5];
+
 const MesReservations = () => {
   const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
@@ -34,6 +41,15 @@ const MesReservations = () => {
   const [modeByReservation, setModeByReservation] = useState({});
   const [paiementLoading, setPaiementLoading] = useState({});
   const [count, setCount] = useState(null);
+  const [avisByReservation, setAvisByReservation] = useState({});
+  const [avisChecked, setAvisChecked] = useState({});
+  const [avisReservation, setAvisReservation] = useState(null);
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   const loadPaiements = async (list) => {
     const results = await Promise.all(
@@ -111,6 +127,44 @@ const MesReservations = () => {
       active = false;
     };
   }, []);
+
+
+  useEffect(() => {
+    const terminees = reservations.filter((r) => canReview(r.statutReservation));
+
+    let active = true;
+
+    const loadAvis = async () => {
+      const results = await Promise.all(
+        terminees.map(async (r) => {
+          try {
+            return [r.id, await avisService.findAvisByReservation(r.id)];
+          } catch {
+            return [r.id, null];
+          }
+        })
+      );
+
+      if (!active) return;
+
+      setAvisByReservation(Object.fromEntries(results));
+      setAvisChecked(
+        Object.fromEntries(terminees.map((r) => [r.id, true]))
+      );
+    };
+
+    loadAvis();
+
+    return () => {
+      active = false;
+    };
+  }, [reservations]);
+
+  const handleAvisSuccess = (avis) => {
+    setAvisByReservation((prev) => ({ ...prev, [avis.reservationId]: avis }));
+    setAvisChecked((prev) => ({ ...prev, [avis.reservationId]: true }));
+    showNotification("Votre avis a bien été envoyé à l'artisan.", "success");
+  };
 
   const handleCancel = async (id) => {
     const confirmed = window.confirm("Confirmer l'annulation de cette réservation ?");
@@ -191,6 +245,8 @@ const MesReservations = () => {
             const paiement = paiements[reservation.id];
             const isLoading = paiementLoading[reservation.id];
             const selectedMode = modeByReservation[reservation.id] || paiement?.modePaiement || "CASH";
+            const avisForReservation = avisByReservation[reservation.id];
+            const avisIsChecked = Boolean(avisChecked[reservation.id]);
 
             return (
               <Card key={reservation.id} className="border-gray-200 bg-white shadow-sm">
@@ -300,6 +356,56 @@ const MesReservations = () => {
                           {canceling === reservation.id ? "Annulation..." : "Annuler"}
                         </button>
                       )}
+
+                      {canReview(reservation.statutReservation) && (
+                        avisForReservation ? (
+                          <div className="max-w-[16rem] rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-left sm:w-full">
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-xs font-bold uppercase tracking-wider text-amber-800">
+                                Avis donné
+                              </p>
+                              <div className="flex items-center">
+                                {STARS.map((star) => (
+                                  <Star
+                                    key={star}
+                                    size={13}
+                                    className={
+                                      star <= avisForReservation.note
+                                        ? "fill-yellow-400 text-yellow-400"
+                                        : "text-slate-300"
+                                    }
+                                  />
+                                ))}
+                              </div>
+                            </div>
+
+                            {avisForReservation.commentaire && (
+                              <p className="mt-1.5 text-xs leading-relaxed text-slate-700">
+                                {avisForReservation.commentaire}
+                              </p>
+                            )}
+
+                            {avisForReservation.dateCreation && (
+                              <p className="mt-1.5 text-[11px] text-slate-500">
+                                Le {new Date(avisForReservation.dateCreation).toLocaleDateString("fr-FR")}
+                              </p>
+                            )}
+                          </div>
+                        ) : avisIsChecked ? (
+                          <button
+                            type="button"
+                            onClick={() => setAvisReservation(reservation)}
+                            className="flex items-center gap-2 rounded-lg bg-[#0B1F3A] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#132d52]"
+                          >
+                            <Star size={12} />
+                            Donner un avis
+                          </button>
+                        ) : (
+                          <span className="text-xs text-slate-400">
+                            Vérification de l'avis...
+                          </span>
+                        )
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -308,6 +414,25 @@ const MesReservations = () => {
           })}
         </div>
       )}
+
+      {notification && (
+        <div
+          className={`fixed bottom-6 right-6 z-50 rounded-xl px-4 py-3 text-sm text-white shadow-lg ${
+            notification.type === "error" ? "bg-red-600" : "bg-emerald-600"
+          }`}
+        >
+          {notification.message}
+        </div>
+      )}
+
+      <AvisForm
+        open={Boolean(avisReservation)}
+        onOpenChange={(open) => {
+          if (!open) setAvisReservation(null);
+        }}
+        reservation={avisReservation}
+        onSuccess={handleAvisSuccess}
+      />
     </div>
   );
 };
