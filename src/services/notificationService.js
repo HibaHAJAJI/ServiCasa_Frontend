@@ -21,7 +21,7 @@ class NotificationSocketService {
 
     this.isConnecting = true;
 
-    const socketUrl = import.meta.env.VITE_WS_URL || "http://localhost:8081/ws";
+    const socketUrl = import.meta.env.VITE_WS_URL || "http://localhost:8080/ws";
 
     try {
       this.stompClient = new Client({

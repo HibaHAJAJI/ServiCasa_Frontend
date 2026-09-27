@@ -1,0 +1,25 @@
+# Dependances installees et artefacts de build : regeneres dans l'image
+node_modules/
+dist/
+dist-ssr/
+
+# Dependance de developpement locale
+.vite/
+
+# Depot Git & metadonnees
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+
+# Docker
+# (nginx.conf reste volontairement dans le contexte de build :
+#  le Dockerfile le copie vers /etc/nginx/conf.d/default.conf)
+Dockerfile
+.dockerignore
+
+# Divers
+*.log
+npm-debug.log*
