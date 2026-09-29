@@ -1,5 +1,17 @@
 import api from "./axios";
 
+const toParamValue = (value) => {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  if (typeof value === "object") {
+    return String(value.nom ?? value.name ?? value.id ?? "").trim();
+  }
+
+  return String(value).trim();
+};
+
 const artisanService = {
   getAll: async (page = 0, size = 50) => {
     const response = await api.get(
@@ -37,29 +49,30 @@ const artisanService = {
     return response.data;
   },
 
-  searchArtisans: async (specialite = "", ville = "") => {
-    const s = (specialite || "").trim();
-    const v = (ville || "").trim();
+  getSpecialitesAndVille: async (ville, specialite, page = 0, size = 50) => {
+    const response = await api.get(
+      `/artisans/search?ville=${encodeURIComponent(toParamValue(ville))}&specialite=${encodeURIComponent(toParamValue(specialite))}&page=${page}&size=${size}`
+    );
+    return response.data;
+  },
 
-    let response;
+  searchArtisans: async (specialite = "", ville = "", page = 0, size = 50) => {
+    const special = toParamValue(specialite);
+    const villes = toParamValue(ville);
 
-    if (s && v) {
-      response = await api.get(
-        `/artisans/specialite-ville?specialite=${encodeURIComponent(s)}&ville=${encodeURIComponent(v)}&page=0&size=50`
-      );
-    } else if (s) {
-      response = await api.get(
-        `/artisans/specialite?specialite=${encodeURIComponent(s)}&page=0&size=50`
-      );
-    } else if (v) {
-      response = await api.get(
-        `/artisans/ville?ville=${encodeURIComponent(v)}&page=0&size=50`
-      );
-    } else {
-      response = await api.get("/artisans?page=0&size=50");
+    if (special && ville) {
+      return artisanService.getSpecialitesAndVille(villes, special, page, size);
     }
 
-    return response.data;
+    if (special) {
+      return artisanService.findBySpecialite(special, page, size);
+    }
+
+    if (villes) {
+      return artisanService.findByVille(villes, page, size);
+    }
+
+    return artisanService.getAll(page, size);
   },
 };
 

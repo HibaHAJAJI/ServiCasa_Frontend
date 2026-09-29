@@ -55,6 +55,21 @@ const ArtisanProfile = () => {
     );
   };
 
+  const toLabel = (value) => {
+    if (value === undefined || value === null) {
+      return "";
+    }
+
+    if (typeof value === "object") {
+      return value.nom ?? "";
+    }
+
+    return String(value);
+  };
+
+  const specialiteLabel = toLabel(artisan?.specialite);
+  const villeLabel = toLabel(artisan?.ville);
+
   const hasReviews = Number(nombreAvis) > 0;
 
   useEffect(() => {
@@ -266,20 +281,20 @@ const ArtisanProfile = () => {
                 </h1>
 
                 <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-slate-500">
-                  {hasValue(artisan.specialite) && (
+                  {hasValue(specialiteLabel) && (
                     <span className="flex items-center gap-1">
                       <Briefcase size={15} />
-                      {artisan.specialite}
+                      {specialiteLabel}
                     </span>
                   )}
 
-                  {hasValue(artisan.ville) && (
+                  {hasValue(villeLabel) && (
                     <>
                       <span>•</span>
 
                       <span className="flex items-center gap-1">
                         <MapPin size={15} />
-                        {artisan.ville}
+                        {villeLabel}
                       </span>
                     </>
                   )}
@@ -296,7 +311,7 @@ const ArtisanProfile = () => {
             </Button>
           </div>
 
-          {(hasValue(artisan.specialite) ||
+          {(hasValue(specialiteLabel) ||
             hasValue(artisan.tarifHoraire) ||
             hasValue(artisan.anneesExperience) ||
             hasValue(artisan.zoneIntervention)) && (
@@ -306,7 +321,7 @@ const ArtisanProfile = () => {
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {hasValue(artisan.specialite) && (
+                {hasValue(specialiteLabel) && (
                   <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                     <div className="flex items-center gap-2 text-xs text-slate-400 uppercase font-semibold">
                       <Briefcase size={15} />
@@ -314,7 +329,7 @@ const ArtisanProfile = () => {
                     </div>
 
                     <p className="mt-1 font-semibold text-[#0B1F3A]">
-                      {artisan.specialite}
+                      {specialiteLabel}
                     </p>
                   </div>
                 )}
@@ -364,7 +379,7 @@ const ArtisanProfile = () => {
             </section>
           )}
 
-          {(hasValue(artisan.ville) ||
+          {(hasValue(villeLabel) ||
             hasValue(artisan.telephone)) && (
             <section className="mt-6">
               <h2 className="font-semibold text-[#0B1F3A] mb-3">
@@ -372,7 +387,7 @@ const ArtisanProfile = () => {
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {hasValue(artisan.ville) && (
+                {hasValue(villeLabel) && (
                   <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                     <div className="flex items-center gap-2 text-xs text-slate-400 uppercase font-semibold">
                       <MapPin size={15} />
@@ -380,7 +395,7 @@ const ArtisanProfile = () => {
                     </div>
 
                     <p className="mt-1 font-semibold text-[#0B1F3A]">
-                      {artisan.ville}
+                      {villeLabel}
                     </p>
                   </div>
                 )}

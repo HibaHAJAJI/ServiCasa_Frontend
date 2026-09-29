@@ -11,9 +11,23 @@ const hasValue = (value) =>
   value !== null &&
   String(value).trim() !== "";
 
+const toLabel = (value) => {
+  if (value === undefined || value === null) {
+    return "";
+  }
+
+  if (typeof value === "object") {
+    return value.nom ?? "";
+  }
+
+  return String(value);
+};
+
 const ArtisanCard = ({ artisan, onViewProfile }) => {
   const firstName = hasValue(artisan.prenom) ? artisan.prenom : "";
   const lastName = hasValue(artisan.nom) ? artisan.nom : "";
+  const specialiteLabel = toLabel(artisan.specialite);
+  const villeLabel = toLabel(artisan.ville);
 
   return (
     <Card 
@@ -39,12 +53,12 @@ const ArtisanCard = ({ artisan, onViewProfile }) => {
               </div>
 
               <p className="mt-1 truncate text-xs text-slate-500 sm:text-sm">
-                {hasValue(artisan.specialite)
-                  ? artisan.specialite
+                {hasValue(specialiteLabel)
+                  ? specialiteLabel
                   : "Spécialité non renseignée"}
 
-                {hasValue(artisan.ville) && (
-                  <> · {artisan.ville}</>
+                {hasValue(villeLabel) && (
+                  <> · {villeLabel}</>
                 )}
               </p>
             </div>
@@ -59,9 +73,9 @@ const ArtisanCard = ({ artisan, onViewProfile }) => {
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {hasValue(artisan.specialite) && (
+            {hasValue(specialiteLabel) && (
               <span className="rounded-md bg-slate-100 px-2 py-1 text-[10px] font-medium text-slate-600 sm:text-xs">
-                {artisan.specialite}
+                {specialiteLabel}
               </span>
             )}
 
